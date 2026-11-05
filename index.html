@@ -18,7 +18,7 @@
             --card-bg: rgba(22, 22, 24, 0.85);
             --text-main: #f5f5f7;
             --text-muted: #86868b;
-            --accent: #30d158; /* Zielony akcent fitness */
+            --accent: #30d158;
             --glass-border: rgba(255, 255, 255, 0.1);
         }
 
@@ -115,11 +115,11 @@
 
     <div id="toast-container"></div>
 
-    <!-- MODAL KONFIGURACJI PIERWSZEGO URUCHOMIENIA / PARAMETRÓW -->
+    <!-- MODAL PARAMETRÓW I CELU -->
     <div id="setup-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
             <h2 class="text-2xl font-bold mb-1">Twoje Parametry</h2>
-            <p class="text-xs text-slate-400 mb-6">Ustawienia te pozwolą precyzyjnie wyliczyć Twoje zapotrzebowanie kaloryczne.</p>
+            <p class="text-xs text-slate-400 mb-6">Wprowadź dane, aby obliczyć zapotrzebowanie kaloryczne.</p>
             
             <div class="space-y-4">
                 <div>
@@ -156,20 +156,20 @@
                 <div>
                     <label class="text-xs text-slate-400 block mb-1">Aktywność fizyczna</label>
                     <select id="user-activity" class="w-full bg-neutral-900 border border-neutral-800 rounded-xl p-3 text-white text-sm">
-                        <option value="1.2">Niska (brak treningów, praca siedząca)</option>
-                        <option value="1.375">Lekka (trening 1-3 razy w tygodniu)</option>
-                        <option value="1.55" selected>Umiarkowana (trening 3-5 razy w tygodniu)</option>
-                        <option value="1.725">Wysoka (ciężkie treningi 6-7 razy w tygodniu)</option>
+                        <option value="1.2">Niska (brak treningów)</option>
+                        <option value="1.375">Lekka (trening 1-3x w tyg.)</option>
+                        <option value="1.55" selected>Umiarkowana (trening 3-5x w tyg.)</option>
+                        <option value="1.725">Wysoka (ciężkie treningi 6-7x w tyg.)</option>
                     </select>
                 </div>
             </div>
             <button onclick="saveUserParams()" class="w-full bg-green-500 hover:bg-green-400 text-black font-bold py-3.5 rounded-xl mt-6 transition text-sm">
-                Zapisz i oblicz zapotrzebowanie
+                Zapisz i oblicz
             </button>
         </div>
     </div>
 
-    <!-- WIDOK: HOME / DASHBOARD -->
+    <!-- WIDOK: HOME -->
     <div id="view-home" class="view-section active p-5">
         <header class="flex justify-between items-center mb-6">
             <div>
@@ -227,7 +227,7 @@
         </div>
     </div>
 
-    <!-- WIDOK: SKANER POSIŁKU -->
+    <!-- WIDOK: SKANER -->
     <div id="view-scanner" class="view-section p-5">
         <header class="mb-5">
             <h1 class="text-2xl font-bold tracking-tight">Skaner Posiłku AI</h1>
@@ -270,7 +270,7 @@
         </button>
     </div>
 
-    <!-- WIDOK: SZEF KUCHNI (GENERATOR PRZEPISÓW) -->
+    <!-- WIDOK: SZEF KUCHNI -->
     <div id="view-chef" class="view-section p-5">
         <header class="mb-5">
             <h1 class="text-2xl font-bold tracking-tight">Szef Kuchni AI</h1>
@@ -279,7 +279,7 @@
 
         <div class="glass-panel p-4 mb-4">
             <label class="text-xs text-slate-400 block mb-1">Co masz w lodówce lub co chcesz zjeść?</label>
-            <textarea id="chef-prompt" rows="3" class="w-full bg-neutral-900 border border-neutral-800 rounded-xl p-3 text-white placeholder-slate-500 focus:outline-none focus:border-green-500 text-xs resize-none" placeholder="Np. Mam pierś z kurczaka, ryż, brokuły. Chcę coś szybkiego do 500 kcal."></textarea>
+            <textarea id="chef-prompt" rows="3" class="w-full bg-neutral-900 border border-neutral-800 rounded-xl p-3 text-white placeholder-slate-500 focus:outline-none focus:border-green-500 text-xs resize-none" placeholder="Np. Mam kurczaka, ryż, brokuły. Chcę posiłek do 500 kcal."></textarea>
             <button id="chef-btn" onclick="generateRecipe()" class="w-full bg-green-500 hover:bg-green-400 text-black font-bold py-3 rounded-xl mt-3 transition text-xs flex items-center justify-center gap-2">
                 <i class="fas fa-utensils"></i> Generuj Przepis
                 <div id="chef-loader" class="loader" style="border-top-color: black;"></div>
@@ -343,12 +343,10 @@
     </nav>
 
     <script>
-        // --- STAN APLIKACJI ---
         let dailyData = JSON.parse(localStorage.getItem('fitai_daily_data')) || { kcal: 0, protein: 0, carbs: 0, fat: 0, date: new Date().toDateString() };
         let userParams = JSON.parse(localStorage.getItem('fitai_user_params')) || null;
         let currentImageBase64 = null;
 
-        // Inicjalizacja daty
         document.getElementById('current-date').textContent = new Date().toLocaleDateString('pl-PL', { weekday: 'long', day: 'numeric', month: 'long' });
 
         if (dailyData.date !== new Date().toDateString()) {
@@ -357,7 +355,6 @@
             updateDashboard();
         }
 
-        // Sprawdź pierwsze uruchomienie / parametry
         if (!userParams) {
             openSetupModal();
         } else {
@@ -384,7 +381,6 @@
             }
         }
 
-        // --- OBSŁUGA PARAMETRÓW I TDEE ---
         function openSetupModal() {
             if (userParams) {
                 document.getElementById('user-goal').value = userParams.goal || 'cut';
@@ -422,7 +418,6 @@
 
         function calculateTargets() {
             if (!userParams) return;
-            // Wzór Mifflin-St Jeor
             let bmr = (10 * userParams.weight) + (6.25 * userParams.height) - (5 * userParams.age);
             bmr += (userParams.gender === 'm' ? 5 : -161);
 
@@ -431,8 +426,8 @@
             if (userParams.goal === 'bulk') tdee += 350;
 
             userParams.targetKcal = Math.round(tdee);
-            userParams.targetProtein = Math.round(userParams.weight * 2.0); // 2g na kg masy
-            userParams.targetFat = Math.round((userParams.targetKcal * 0.25) / 9); // 25% kalorii z tłuszczu
+            userParams.targetProtein = Math.round(userParams.weight * 2.0);
+            userParams.targetFat = Math.round((userParams.targetKcal * 0.25) / 9);
             userParams.targetCarbs = Math.round((userParams.targetKcal - (userParams.targetProtein * 4) - (userParams.targetFat * 9)) / 4);
 
             localStorage.setItem('fitai_user_params', JSON.stringify(userParams));
@@ -460,7 +455,6 @@
             document.getElementById('kcal-bar').style.width = `${progress}%`;
         }
 
-        // --- OBSŁUGA ZDJĘĆ Z KOMPRESJĄ ---
         function handleImage(input) {
             const file = input.files[0];
             if (!file) return;
@@ -504,7 +498,6 @@
             document.getElementById('image-preview').src = '';
         }
 
-        // --- ANALIZA POSIŁKU (SKANER) ---
         async function runAnalysis() {
             const text = document.getElementById('meal-description').value.trim();
             const apiKey = localStorage.getItem('gemini_api_key');
@@ -587,7 +580,6 @@
             }
         }
 
-        // --- SZEF KUCHNI (GENERATOR PRZEPISÓW) ---
         async function generateRecipe() {
             const promptText = document.getElementById('chef-prompt').value.trim();
             const apiKey = localStorage.getItem('gemini_api_key');
