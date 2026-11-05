@@ -516,8 +516,17 @@
             loader.style.display = 'block';
 
             try {
-                // Użycie nagłówka x-goog-api-key zamiast klucza w adresie URL
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`;
+                // Obsługa klucza OAuth / AQ lub klasycznego AIzaSy w adresie URL / nagłówku
+                const isOAuthKey = apiKey.startsWith('AQ.');
+                const url = isOAuthKey 
+                    ? `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`
+                    : `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
+                const headers = { 'Content-Type': 'application/json' };
+                if (isOAuthKey) {
+                    headers['Authorization'] = `Bearer ${apiKey}`;
+                }
+
                 const prompt = `Jesteś ekspertem dietetyki. Przeanalizuj posiłek. Zwróć WYŁĄCZNIE czysty obiekt JSON bez znaczników markdown, w formacie:
                 {"kcal": 0, "protein": 0, "carbs": 0, "fat": 0}
                 Opis posiłku: ${text || "brak"}, uwzględnij widoczne na zdjęciu produkty.`;
@@ -534,14 +543,15 @@
 
                 const response = await fetch(url, {
                     method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'x-goog-api-key': apiKey 
-                    },
+                    headers: headers,
                     body: JSON.stringify({ contents: [{ role: "user", parts: parts }] })
                 });
 
-                if (!response.ok) throw new Error("Błąd autoryzacji lub sieci.");
+                if (!response.ok) {
+                    const errData = await response.json().catch(() => ({}));
+                    console.error("API Error details:", errData);
+                    throw new Error(errData.error?.message || "Błąd uwierzytelniania API.");
+                }
 
                 const data = await response.json();
                 const resultText = data.candidates[0].content.parts[0].text;
@@ -570,7 +580,7 @@
 
             } catch (error) {
                 console.error(error);
-                showToast("Wystąpił błąd. Sprawdź klucz API.");
+                showToast(error.message || "Wystąpił błąd zapytania.");
             } finally {
                 btnText.style.display = 'block';
                 icon.style.display = 'block';
@@ -598,17 +608,23 @@
             loader.style.display = 'inline-block';
 
             try {
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`;
+                const isOAuthKey = apiKey.startsWith('AQ.');
+                const url = isOAuthKey 
+                    ? `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`
+                    : `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
+                const headers = { 'Content-Type': 'application/json' };
+                if (isOAuthKey) {
+                    headers['Authorization'] = `Bearer ${apiKey}`;
+                }
+
                 const fullPrompt = `Jesteś profesjonalnym szefem kuchni i dietetykiem. Użytkownik podaje składniki/preferencje: "${promptText}". 
                 Stwórz przepis. Zwróć WYŁĄCZNIE obiekt JSON w formacie bez żadnych znaczników markdown:
                 {"title": "Nazwa dania", "kcal": 500, "protein": 35, "carbs": 50, "fat": 15, "steps": "1. Krok pierwszy...\n2. Krok drugi..."}`;
 
                 const response = await fetch(url, {
                     method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'x-goog-api-key': apiKey 
-                    },
+                    headers: headers,
                     body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: fullPrompt }] }] })
                 });
 
