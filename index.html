@@ -109,7 +109,7 @@
 <body class="bg-slate-50 dark:bg-darkbase-900 text-slate-900 dark:text-slate-50 h-[100dvh] w-full overflow-hidden flex transition-colors duration-300 selection:bg-brand-500 selection:text-white">
 
     <!-- Toast Notification -->
-    <div id="toast" class="fixed top-6 left-1/2 transform -translate-x-1/2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-6 py-3 rounded-full shadow-2xl z-50 transition-all duration-400 opacity-0 pointer-events-none flex items-center gap-3 glass-panel">
+    <div id="toast" class="fixed top-[max(4.5rem,env(safe-area-inset-top))] left-1/2 transform -translate-x-1/2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-6 py-3 rounded-full shadow-2xl z-50 transition-all duration-400 opacity-0 pointer-events-none flex items-center gap-3 glass-panel">
         <i class="ph-fill ph-info text-xl text-brand-400"></i>
         <span id="toast-msg" class="text-sm font-semibold tracking-wide">Wiadomość</span>
     </div>
@@ -865,7 +865,7 @@
             const payload = {
                 contents: [{
                     role: "user",
-                    parts: [{ text: `Przeanalizuj posiłek. Opis: "${desc || 'brak'}". Oszacuj Kcal i makro (B, W, T) dla CAŁEJ PORCJI (jako liczby całkowite). Zwróć estetyczną nazwę (mealName) oraz krótki werdykt po polsku (evaluation - czy to zdrowe/fit?). Format JSON wg schematu.` }]
+                    parts: [{ text: `Przeanalizuj posiłek. Zwróć wyłącznie czysty format JSON (bez znaczników markdown typu \`\`\`json). Opis: "${desc || 'brak'}". Oszacuj Kcal i makro (B, W, T) dla CAŁEJ PORCJI (jako liczby całkowite). Zwróć estetyczną nazwę (mealName) oraz krótki werdykt po polsku (evaluation - czy to zdrowe/fit?).` }]
                 }],
                 generationConfig: {
                     responseMimeType: "application/json",
@@ -881,16 +881,26 @@
                 }
             };
 
-            if (currentBase64Image) payload.contents[0].parts.push({ inlineData: { mimeType: "image/jpeg", data: currentBase64Image } });
+            // Dodajemy zdjęcie do promptu TYLKO jeśli zostało wybrane
+            if (currentBase64Image) {
+                payload.contents[0].parts.push({ inlineData: { mimeType: "image/jpeg", data: currentBase64Image } });
+            }
 
             try {
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
                 });
                 const result = await res.json();
-                const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                
+                if (result.error) {
+                    throw new Error(result.error.message || "Błąd odpowiedzi API");
+                }
+
+                let jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
                 
                 if (jsonText) {
+                    // Czyszczenie znaczników markdown, które Gemini czasem dorzuca mimo wymuszania JSON Schema
+                    jsonText = jsonText.replace(/```json/gi, '').replace(/```/g, '').trim();
                     const d = JSON.parse(jsonText);
                     state.tempMeal = { name: d.mealName, cals: d.calories, p: d.protein, c: d.carbs, f: d.fat, eval: d.evaluation, time: new Date().toLocaleTimeString('pl-PL', {hour:'2-digit', minute:'2-digit'}) };
                     
@@ -899,9 +909,13 @@
                     document.getElementById('res-carb').innerText = d.carbs + 'g'; document.getElementById('res-fat').innerText = d.fat + 'g';
                     
                     document.getElementById('ai-result').classList.remove('hidden');
-                } else throw new Error();
+                } else {
+                    throw new Error("Pusta odpowiedź od modelu.");
+                }
             } catch (e) {
-                showToast("Błąd analizy obrazu."); document.getElementById('btn-analyze').classList.remove('hidden');
+                console.error("Szczegóły błędu analizy:", e);
+                showToast("Błąd analizy. Spróbuj zmodyfikować opis."); 
+                document.getElementById('btn-analyze').classList.remove('hidden');
             } finally {
                 document.getElementById('ai-loading').classList.add('hidden'); document.getElementById('ai-loading').classList.remove('flex');
             }
