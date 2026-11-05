@@ -298,7 +298,7 @@
         </header>
 
         <div class="glass-panel p-4 mb-4">
-            <label class="text-xs font-semibold text-green-400 block mb-2"><i class="fas fa-key mr-1"></i> Klucz Gemini API</label>
+            <label class="text-xs font-semibold text-green-400 block mb-2"><i class="fas fa-key mr-1"></i> Klucz Gemini API (AQ... lub AIzaSy...)</label>
             <input type="password" id="api-key-input" placeholder="Wklej klucz..." class="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-3.5 py-3 text-white text-xs focus:outline-none focus:border-green-500 mb-3">
             <button onclick="saveApiKey()" class="w-full bg-green-500 hover:bg-green-400 text-black font-bold py-3 rounded-xl transition text-xs">
                 Zapisz Klucz Bezpiecznie
@@ -492,6 +492,48 @@
             document.getElementById('image-preview').src = '';
         }
 
+        // Uniwersalna funkcja wysyłająca zapytanie z uwzględnieniem typu klucza (AQ lub AIzaSy)
+        async function callGeminiApi(promptText, imageBase64 = null) {
+            const apiKey = localStorage.getItem('gemini_api_key');
+            if (!apiKey) throw new Error("Brak klucza API w ustawieniach.");
+
+            const isOAuthKey = apiKey.startsWith('AQ.');
+            const url = isOAuthKey 
+                ? `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`
+                : `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
+            const headers = { 'Content-Type': 'application/json' };
+            if (isOAuthKey) {
+                headers['Authorization'] = `Bearer ${apiKey}`;
+            }
+
+            const parts = [{ text: promptText }];
+            if (imageBase64) {
+                parts.push({
+                    inlineData: {
+                        mimeType: "image/jpeg",
+                        data: imageBase64.split(',')[1]
+                    }
+                });
+            }
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify({ contents: [{ role: "user", parts: parts }] })
+            });
+
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                throw new Error(errData.error?.message || "Błąd autoryzacji lub sieci API.");
+            }
+
+            const data = await response.json();
+            const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (!text) throw new Error("Brak poprawnej odpowiedzi od modelu AI.");
+            return text;
+        }
+
         async function runAnalysis() {
             const text = document.getElementById('meal-description').value.trim();
             const apiKey = localStorage.getItem('gemini_api_key');
@@ -516,45 +558,11 @@
             loader.style.display = 'block';
 
             try {
-                // Obsługa klucza OAuth / AQ lub klasycznego AIzaSy w adresie URL / nagłówku
-                const isOAuthKey = apiKey.startsWith('AQ.');
-                const url = isOAuthKey 
-                    ? `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`
-                    : `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-
-                const headers = { 'Content-Type': 'application/json' };
-                if (isOAuthKey) {
-                    headers['Authorization'] = `Bearer ${apiKey}`;
-                }
-
                 const prompt = `Jesteś ekspertem dietetyki. Przeanalizuj posiłek. Zwróć WYŁĄCZNIE czysty obiekt JSON bez znaczników markdown, w formacie:
                 {"kcal": 0, "protein": 0, "carbs": 0, "fat": 0}
                 Opis posiłku: ${text || "brak"}, uwzględnij widoczne na zdjęciu produkty.`;
 
-                const parts = [{ text: prompt }];
-                if (currentImageBase64) {
-                    parts.push({
-                        inlineData: {
-                            mimeType: "image/jpeg",
-                            data: currentImageBase64.split(',')[1]
-                        }
-                    });
-                }
-
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: headers,
-                    body: JSON.stringify({ contents: [{ role: "user", parts: parts }] })
-                });
-
-                if (!response.ok) {
-                    const errData = await response.json().catch(() => ({}));
-                    console.error("API Error details:", errData);
-                    throw new Error(errData.error?.message || "Błąd uwierzytelniania API.");
-                }
-
-                const data = await response.json();
-                const resultText = data.candidates[0].content.parts[0].text;
+                const resultText = await callGeminiApi(prompt, currentImageBase64);
                 
                 const jsonMatch = resultText.match(/\{[\s\S]*?\}/);
                 if (!jsonMatch) throw new Error("Błąd odczytu danych z AI.");
@@ -608,30 +616,11 @@
             loader.style.display = 'inline-block';
 
             try {
-                const isOAuthKey = apiKey.startsWith('AQ.');
-                const url = isOAuthKey 
-                    ? `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`
-                    : `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-
-                const headers = { 'Content-Type': 'application/json' };
-                if (isOAuthKey) {
-                    headers['Authorization'] = `Bearer ${apiKey}`;
-                }
-
                 const fullPrompt = `Jesteś profesjonalnym szefem kuchni i dietetykiem. Użytkownik podaje składniki/preferencje: "${promptText}". 
                 Stwórz przepis. Zwróć WYŁĄCZNIE obiekt JSON w formacie bez żadnych znaczników markdown:
                 {"title": "Nazwa dania", "kcal": 500, "protein": 35, "carbs": 50, "fat": 15, "steps": "1. Krok pierwszy...\n2. Krok drugi..."}`;
 
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: headers,
-                    body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: fullPrompt }] }] })
-                });
-
-                if (!response.ok) throw new Error("Błąd API");
-
-                const data = await response.json();
-                const text = data.candidates[0].content.parts[0].text;
+                const text = await callGeminiApi(fullPrompt);
                 const jsonMatch = text.match(/\{[\s\S]*?\}/);
                 if (!jsonMatch) throw new Error("Błąd formatu");
 
@@ -645,7 +634,7 @@
 
             } catch (err) {
                 console.error(err);
-                showToast("Nie udało się wygenerować przepisu.");
+                showToast(err.message || "Nie udało się wygenerować przepisu.");
             } finally {
                 btnText.style.opacity = '1';
                 loader.style.display = 'none';
