@@ -7,326 +7,490 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>FitAI Pro</title>
     
-    <!-- Ikona -->
+    <!-- Ikona aplikacji (Sztanga/Fitness) -->
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2964/2964095.png">
     
-    <!-- Tailwind & FontAwesome -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* True Black OLED Base */
-        body {
-            background-color: #000000;
-            color: #ffffff;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-            padding-top: env(safe-area-inset-top);
-            min-height: 100vh;
-            overflow-x: hidden;
+        :root {
+            --bg-color: #000000;
+            --card-bg: rgba(22, 22, 24, 0.85);
+            --text-main: #f5f5f7;
+            --text-muted: #86868b;
+            --accent: #30d158; /* Zielony akcent fitness */
+            --glass-border: rgba(255, 255, 255, 0.1);
         }
 
-        /* Glassmorphism Cards */
-        .glass-card {
-            background-color: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            padding-bottom: calc(90px + env(safe-area-inset-bottom));
+            padding-top: env(safe-area-inset-top);
+            min-height: 100vh;
+        }
+
+        .glass-panel {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
             border-radius: 1.5rem;
         }
 
-        /* Bottom Nav Glass */
         .bottom-nav {
-            background-color: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-top: 1px solid var(--glass-border);
             padding-bottom: env(safe-area-inset-bottom);
         }
 
-        /* Floating Action Button (Scanner) */
+        .nav-btn {
+            color: var(--text-muted);
+            transition: color 0.2s;
+        }
+        .nav-btn.active {
+            color: var(--accent);
+        }
+
         .fab-btn {
-            background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
-            box-shadow: 0 8px 32px rgba(16, 185, 129, 0.4);
-            transform: translateY(-24px);
-            border: 6px solid #000000;
-            transition: transform 0.2s;
+            background: linear-gradient(135deg, #34c759, #248a3d);
+            box-shadow: 0 8px 25px rgba(52, 199, 89, 0.4);
+            border: 4px solid var(--bg-color);
         }
-        .fab-btn:active { transform: translateY(-20px) scale(0.95); }
 
-        /* Nav Items */
-        .nav-item {
-            color: rgba(255, 255, 255, 0.4);
-            transition: color 0.3s ease;
-        }
-        .nav-item.active { color: #34d399; }
+        .view-section { display: none; }
+        .view-section.active { display: block; animation: fadeIn 0.25s ease-out; }
 
-        /* View Transitions */
-        .view-section { 
-            display: none; 
-            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            padding-bottom: 120px; /* Space for nav */
-        }
-        .view-section.active { display: block; }
-        
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px); }
+            from { opacity: 0; transform: translateY(6px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Hide Default Inputs */
         input[type="file"] { display: none; }
 
-        /* Dynamic Island Safe Toasts */
         #toast-container {
             position: fixed;
-            top: calc(env(safe-area-inset-top, 45px) + 10px);
+            top: calc(env(safe-area-inset-top, 20px) + 12px);
             left: 50%;
             transform: translateX(-50%);
             z-index: 9999;
             width: 90%;
-            max-width: 350px;
-            pointer-events: none;
+            max-width: 380px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
+            pointer-events: none;
         }
-
         .toast {
             background: rgba(255, 255, 255, 0.95);
-            color: #000000;
-            padding: 14px 20px;
-            border-radius: 99px;
+            color: #000;
+            padding: 12px 18px;
+            border-radius: 999px;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             text-align: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1), fadeOut 0.4s ease-in 3.5s forwards;
-            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            animation: slideDown 0.3s ease, fadeOut 0.3s ease 3.2s forwards;
         }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
 
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-30px) scale(0.9); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        @keyframes fadeOut {
-            from { opacity: 1; transform: translateY(0); }
-            to { opacity: 0; transform: translateY(-20px); }
-        }
-
-        /* Spinner */
         .loader {
-            border: 3px solid rgba(255,255,255,0.2);
+            border: 3px solid rgba(255,255,255,0.1);
             border-radius: 50%;
-            border-top: 3px solid #10b981;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
+            border-top: 3px solid var(--accent);
+            width: 22px;
+            height: 22px;
+            animation: spin 0.8s linear infinite;
             display: none;
         }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-    <!-- Toast Notification Container -->
     <div id="toast-container"></div>
 
-    <!-- VIEW: DASHBOARD -->
-    <main id="view-dashboard" class="view-section active p-5">
-        <header class="mb-8 pt-4">
-            <h1 class="text-3xl font-extrabold tracking-tight">Twoje Makro</h1>
-            <p class="text-sm text-gray-400 mt-1" id="date-display">Dziś</p>
-        </header>
-
-        <!-- Main Calories Card -->
-        <div class="glass-card p-6 mb-6 relative overflow-hidden">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500 rounded-full blur-3xl opacity-20 -mr-10 -mt-10"></div>
-            <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Spożyte Kalorie</h2>
-            <div class="flex items-baseline gap-2">
-                <span class="text-5xl font-black" id="dash-kcal">0</span>
-                <span class="text-lg text-gray-400 font-semibold">/ 2500 kcal</span>
-            </div>
+    <!-- MODAL KONFIGURACJI PIERWSZEGO URUCHOMIENIA / PARAMETRÓW -->
+    <div id="setup-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 hidden">
+        <div class="glass-panel w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
+            <h2 class="text-2xl font-bold mb-1">Twoje Parametry</h2>
+            <p class="text-xs text-slate-400 mb-6">Ustawienia te pozwolą precyzyjnie wyliczyć Twoje zapotrzebowanie kaloryczne.</p>
             
-            <div class="w-full bg-white/10 h-3 rounded-full mt-6 overflow-hidden">
-                <div class="bg-gradient-to-r from-emerald-400 to-emerald-500 h-full rounded-full transition-all duration-700 ease-out" style="width: 0%" id="dash-bar"></div>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs text-slate-400 block mb-1">Cel</label>
+                    <select id="user-goal" class="w-full bg-neutral-900 border border-neutral-800 rounded-xl p-3 text-white text-sm">
+                        <option value="cut">Redukcja (Chcę schudnąć)</option>
+                        <option value="maintain">Utrzymanie wagi</option>
+                        <option value="bulk">Masa mięśniowa (Budowanie)</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-xs text-slate-400 block mb-1">Waga (kg)</label>
+                        <input type="number" id="user-weight" class="w-full bg-neutral-900 border border-neutral-800 rounded-xl p-3 text-white text-sm" placeholder="np. 75">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400 block mb-1">Wzrost (cm)</label>
+                        <input type="number" id="user-height" class="w-full bg-neutral-900 border border-neutral-800 rounded-xl p-3 text-white text-sm" placeholder="np. 180">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-xs text-slate-400 block mb-1">Wiek</label>
+                        <input type="number" id="user-age" class="w-full bg-neutral-900 border border-neutral-800 rounded-xl p-3 text-white text-sm" placeholder="np. 21">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400 block mb-1">Płeć</label>
+                        <select id="user-gender" class="w-full bg-neutral-900 border border-neutral-800 rounded-xl p-3 text-white text-sm">
+                            <option value="m">Mężczyzna</option>
+                            <option value="f">Kobieta</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400 block mb-1">Aktywność fizyczna</label>
+                    <select id="user-activity" class="w-full bg-neutral-900 border border-neutral-800 rounded-xl p-3 text-white text-sm">
+                        <option value="1.2">Niska (brak treningów, praca siedząca)</option>
+                        <option value="1.375">Lekka (trening 1-3 razy w tygodniu)</option>
+                        <option value="1.55" selected>Umiarkowana (trening 3-5 razy w tygodniu)</option>
+                        <option value="1.725">Wysoka (ciężkie treningi 6-7 razy w tygodniu)</option>
+                    </select>
+                </div>
             </div>
+            <button onclick="saveUserParams()" class="w-full bg-green-500 hover:bg-green-400 text-black font-bold py-3.5 rounded-xl mt-6 transition text-sm">
+                Zapisz i oblicz zapotrzebowanie
+            </button>
         </div>
+    </div>
 
-        <!-- Macros Grid -->
-        <div class="grid grid-cols-3 gap-4 mb-8">
-            <div class="glass-card p-4 flex flex-col items-center justify-center relative overflow-hidden">
-                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Białko</div>
-                <div class="text-xl font-bold"><span id="dash-protein">0</span><span class="text-sm text-gray-400 ml-1">g</span></div>
+    <!-- WIDOK: HOME / DASHBOARD -->
+    <div id="view-home" class="view-section active p-5">
+        <header class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-2xl font-bold tracking-tight">Dzisiejszy Bilans</h1>
+                <p class="text-xs text-slate-400 mt-0.5" id="current-date">Wczytywanie...</p>
             </div>
-            <div class="glass-card p-4 flex flex-col items-center justify-center relative overflow-hidden">
-                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Węgle</div>
-                <div class="text-xl font-bold"><span id="dash-carbs">0</span><span class="text-sm text-gray-400 ml-1">g</span></div>
-            </div>
-            <div class="glass-card p-4 flex flex-col items-center justify-center relative overflow-hidden">
-                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Tłuszcze</div>
-                <div class="text-xl font-bold"><span id="dash-fat">0</span><span class="text-sm text-gray-400 ml-1">g</span></div>
-            </div>
-        </div>
-
-        <button onclick="resetData()" class="w-full py-4 rounded-xl text-sm font-semibold text-gray-400 hover:bg-white/5 transition-colors flex items-center justify-center gap-2">
-            <i class="fa-solid fa-rotate-right"></i> Rozpocznij nowy dzień
-        </button>
-    </main>
-
-    <!-- VIEW: SCANNER -->
-    <main id="view-scanner" class="view-section p-5">
-        <header class="mb-8 pt-4">
-            <h1 class="text-3xl font-extrabold tracking-tight">Skaner AI</h1>
-            <p class="text-sm text-gray-400 mt-1">Zrób zdjęcie lub opisz posiłek.</p>
+            <button onclick="openSetupModal()" class="w-10 h-10 rounded-full glass-panel flex items-center justify-center text-slate-300">
+                <i class="fas fa-sliders-h text-sm"></i>
+            </button>
         </header>
 
-        <div class="grid grid-cols-2 gap-4 mb-6">
-            <label class="glass-card p-6 flex flex-col items-center justify-center cursor-pointer active:bg-white/20 transition-colors">
-                <div class="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mb-3 text-xl">
-                    <i class="fa-solid fa-camera"></i>
+        <div class="glass-panel p-6 mb-5 relative overflow-hidden">
+            <div class="absolute -right-12 -top-12 w-36 h-36 bg-green-500/10 rounded-full blur-3xl"></div>
+            <div class="flex justify-between items-end mb-4">
+                <div>
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Spożyto / Cel</span>
+                    <div class="flex items-baseline gap-1.5 mt-1">
+                        <span class="text-4xl font-extrabold text-white" id="total-kcal">0</span>
+                        <span class="text-sm text-slate-400" id="target-kcal-label">/ 2500 kcal</span>
+                    </div>
                 </div>
-                <span class="font-bold text-sm">Zrób zdjęcie</span>
-                <input type="file" accept="image/*" capture="environment" onchange="processImage(this)">
+                <div class="text-right">
+                    <span class="text-xs text-slate-400">Pozostało</span>
+                    <div class="text-lg font-bold text-green-400" id="left-kcal">2500</div>
+                </div>
+            </div>
+            <div class="w-full bg-neutral-800 h-2 rounded-full overflow-hidden">
+                <div class="bg-green-500 h-full rounded-full transition-all duration-500" style="width: 0%" id="kcal-bar"></div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3 mb-6">
+            <div class="glass-panel p-4 flex flex-col items-center">
+                <span class="text-[11px] text-slate-400 mb-1">Białko</span>
+                <span class="text-lg font-bold text-white"><span id="total-protein">0</span>g</span>
+                <span class="text-[10px] text-slate-500 mt-0.5" id="target-protein">cel: 0g</span>
+            </div>
+            <div class="glass-panel p-4 flex flex-col items-center">
+                <span class="text-[11px] text-slate-400 mb-1">Węgle</span>
+                <span class="text-lg font-bold text-white"><span id="total-carbs">0</span>g</span>
+                <span class="text-[10px] text-slate-500 mt-0.5" id="target-carbs">cel: 0g</span>
+            </div>
+            <div class="glass-panel p-4 flex flex-col items-center">
+                <span class="text-[11px] text-slate-400 mb-1">Tłuszcze</span>
+                <span class="text-lg font-bold text-white"><span id="total-fat">0</span>g</span>
+                <span class="text-[10px] text-slate-500 mt-0.5" id="target-fat">cel: 0g</span>
+            </div>
+        </div>
+
+        <div class="glass-panel p-4 flex justify-between items-center">
+            <span class="text-xs text-slate-400">Chcesz zresetować dzisiejsze wpisy?</span>
+            <button onclick="resetDailyData()" class="text-xs text-red-400 hover:text-red-300 font-semibold px-3 py-1.5 rounded-lg bg-red-500/10 transition">
+                Resetuj dzień
+            </button>
+        </div>
+    </div>
+
+    <!-- WIDOK: SKANER POSIŁKU -->
+    <div id="view-scanner" class="view-section p-5">
+        <header class="mb-5">
+            <h1 class="text-2xl font-bold tracking-tight">Skaner Posiłku AI</h1>
+            <p class="text-xs text-slate-400 mt-0.5">Zrób zdjęcie lub opisz posiłek słowami.</p>
+        </header>
+
+        <div class="grid grid-cols-2 gap-3 mb-4">
+            <label for="cameraInput" class="glass-panel p-5 flex flex-col items-center justify-center cursor-pointer active:scale-95 transition">
+                <div class="w-10 h-10 rounded-full bg-green-500/15 text-green-400 flex items-center justify-center mb-2 text-lg">
+                    <i class="fas fa-camera"></i>
+                </div>
+                <span class="font-medium text-xs">Aparat</span>
+                <input type="file" accept="image/*" capture="environment" id="cameraInput" onchange="handleImage(this)">
             </label>
 
-            <label class="glass-card p-6 flex flex-col items-center justify-center cursor-pointer active:bg-white/20 transition-colors">
-                <div class="w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center mb-3 text-xl">
-                    <i class="fa-solid fa-image"></i>
+            <label for="galleryInput" class="glass-panel p-5 flex flex-col items-center justify-center cursor-pointer active:scale-95 transition">
+                <div class="w-10 h-10 rounded-full bg-blue-500/15 text-blue-400 flex items-center justify-center mb-2 text-lg">
+                    <i class="fas fa-image"></i>
                 </div>
-                <span class="font-bold text-sm">Galeria</span>
-                <input type="file" accept="image/*" onchange="processImage(this)">
+                <span class="font-medium text-xs">Galeria</span>
+                <input type="file" accept="image/*" id="galleryInput" onchange="handleImage(this)">
             </label>
         </div>
 
-        <div id="preview-container" class="hidden relative mb-6">
-            <img id="preview-img" class="w-full h-48 object-cover rounded-[1.5rem] border border-white/10" src="">
-            <button onclick="clearImage()" class="absolute top-3 right-3 bg-black/60 backdrop-blur-md text-white w-8 h-8 rounded-full flex items-center justify-center">
-                <i class="fa-solid fa-xmark"></i>
+        <div id="image-preview-container" class="hidden mb-4 relative">
+            <img id="image-preview" class="w-full h-44 object-cover rounded-2xl border border-neutral-800" src="" alt="Podgląd">
+            <button onclick="removeImage()" class="absolute top-2 right-2 bg-black/80 text-white w-7 h-7 rounded-full flex items-center justify-center backdrop-blur-md">
+                <i class="fas fa-times text-xs"></i>
             </button>
         </div>
 
-        <div class="glass-card p-2 mb-8">
-            <textarea id="scan-input" rows="3" class="w-full bg-transparent border-none text-white placeholder-gray-500 p-4 focus:ring-0 resize-none font-medium" placeholder="Opisz dodatki (np. 1 łyżka oliwy, garść orzechów...)"></textarea>
+        <div class="glass-panel p-1 mb-4">
+            <textarea id="meal-description" rows="3" class="w-full bg-transparent border-none text-white placeholder-slate-500 p-3.5 focus:ring-0 resize-none text-xs" placeholder="Np. Twaróg półtłusty, łyżeczka miodu, cynamon..."></textarea>
         </div>
 
-        <button id="scan-btn" onclick="analyzeMeal()" class="w-full bg-white text-black font-extrabold py-4 rounded-2xl text-lg flex items-center justify-center gap-3 active:scale-95 transition-transform">
-            <i class="fa-solid fa-wand-magic-sparkles text-emerald-500"></i>
+        <button id="analyze-btn" onclick="runAnalysis()" class="w-full bg-white text-black font-bold py-3.5 rounded-2xl text-sm flex items-center justify-center gap-2 active:scale-95 transition shadow-lg">
+            <i class="fas fa-magic text-green-600"></i>
             <span>Oblicz Kalorie</span>
-            <div id="scan-loader" class="loader"></div>
+            <div id="analyze-loader" class="loader"></div>
         </button>
-    </main>
+    </div>
 
-    <!-- VIEW: SETTINGS -->
-    <main id="view-settings" class="view-section p-5">
-        <header class="mb-8 pt-4">
-            <h1 class="text-3xl font-extrabold tracking-tight">Ustawienia</h1>
-            <p class="text-sm text-gray-400 mt-1">Konfiguracja systemu.</p>
+    <!-- WIDOK: SZEF KUCHNI (GENERATOR PRZEPISÓW) -->
+    <div id="view-chef" class="view-section p-5">
+        <header class="mb-5">
+            <h1 class="text-2xl font-bold tracking-tight">Szef Kuchni AI</h1>
+            <p class="text-xs text-slate-400 mt-0.5">Generator przepisów dopasowany do Twoich makroskładników.</p>
         </header>
 
-        <div class="glass-card p-6">
-            <h2 class="text-sm font-bold text-emerald-400 mb-2 uppercase tracking-wide">Klucz Gemini API</h2>
-            <p class="text-xs text-gray-400 mb-5">
-                Aplikacja działa w 100% lokalnie. Twój klucz jest szyfrowany w pamięci iPhone'a/Maca.
-            </p>
-            <input type="password" id="api-key" placeholder="AIzaSy..." class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-4 text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500 transition-colors mb-4 font-mono">
-            <button onclick="saveKey()" class="w-full bg-white/10 hover:bg-white/20 active:bg-white/30 text-white font-bold py-4 rounded-xl transition-colors">
-                Zapisz Klucz
+        <div class="glass-panel p-4 mb-4">
+            <label class="text-xs text-slate-400 block mb-1">Co masz w lodówce lub co chcesz zjeść?</label>
+            <textarea id="chef-prompt" rows="3" class="w-full bg-neutral-900 border border-neutral-800 rounded-xl p-3 text-white placeholder-slate-500 focus:outline-none focus:border-green-500 text-xs resize-none" placeholder="Np. Mam pierś z kurczaka, ryż, brokuły. Chcę coś szybkiego do 500 kcal."></textarea>
+            <button id="chef-btn" onclick="generateRecipe()" class="w-full bg-green-500 hover:bg-green-400 text-black font-bold py-3 rounded-xl mt-3 transition text-xs flex items-center justify-center gap-2">
+                <i class="fas fa-utensils"></i> Generuj Przepis
+                <div id="chef-loader" class="loader" style="border-top-color: black;"></div>
             </button>
         </div>
-    </main>
 
-    <!-- BOTTOM NAVIGATION BAR -->
-    <nav class="bottom-nav fixed bottom-0 left-0 w-full z-50 px-8 py-3 flex justify-between items-center">
-        <!-- Home -->
-        <button onclick="nav('dashboard')" id="nav-btn-dashboard" class="nav-item active flex flex-col items-center w-16 pt-2">
-            <i class="fa-solid fa-chart-simple text-xl mb-1"></i>
-            <span class="text-[10px] font-bold">Start</span>
+        <div id="recipe-result-container" class="hidden glass-panel p-5">
+            <h2 id="recipe-title" class="text-lg font-bold text-green-400 mb-2"></h2>
+            <div class="flex gap-2 mb-3 text-[11px] text-slate-400 font-medium">
+                <span id="recipe-kcal" class="bg-neutral-800 px-2.5 py-1 rounded-md text-white">0 kcal</span>
+                <span id="recipe-macros" class="bg-neutral-800 px-2.5 py-1 rounded-md text-white">B: 0g | W: 0g | T: 0g</span>
+            </div>
+            <div id="recipe-steps" class="text-xs text-slate-300 leading-relaxed whitespace-pre-line space-y-2"></div>
+        </div>
+    </div>
+
+    <!-- WIDOK: USTAWIENIA -->
+    <div id="view-settings" class="view-section p-5">
+        <header class="mb-6">
+            <h1 class="text-2xl font-bold tracking-tight">Ustawienia API</h1>
+            <p class="text-xs text-slate-400 mt-0.5">Bezpieczny klucz Gemini API w pamięci przeglądarki.</p>
+        </header>
+
+        <div class="glass-panel p-4 mb-4">
+            <label class="text-xs font-semibold text-green-400 block mb-2"><i class="fas fa-key mr-1"></i> Klucz Gemini API</label>
+            <input type="password" id="api-key-input" placeholder="AIzaSy..." class="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-3.5 py-3 text-white text-xs focus:outline-none focus:border-green-500 mb-3">
+            <button onclick="saveApiKey()" class="w-full bg-green-500 hover:bg-green-400 text-black font-bold py-3 rounded-xl transition text-xs">
+                Zapisz Klucz Bezpiecznie
+            </button>
+        </div>
+
+        <div class="glass-panel p-4">
+            <button onclick="openSetupModal()" class="w-full bg-neutral-800 hover:bg-neutral-700 text-white font-semibold py-3 rounded-xl transition text-xs flex items-center justify-center gap-2">
+                <i class="fas fa-calculator text-green-400"></i> Przelicz zapotrzebowanie (Waga, Cel)
+            </button>
+        </div>
+    </div>
+
+    <!-- DOLNY PASEK NAWIGACYJNY -->
+    <nav class="bottom-nav fixed bottom-0 left-0 w-full z-40 px-6 py-2 flex justify-between items-center">
+        <button onclick="switchView('home')" id="nav-home" class="nav-btn active flex flex-col items-center p-1 w-16">
+            <i class="fas fa-chart-pie text-lg mb-1"></i>
+            <span class="text-[10px] font-medium">Start</span>
         </button>
 
-        <!-- FAB Scanner -->
-        <div class="relative w-16 flex justify-center">
-            <button onclick="nav('scanner')" class="fab-btn absolute -top-10 w-16 h-16 rounded-full text-white flex items-center justify-center text-2xl">
-                <i class="fa-solid fa-camera"></i>
+        <button onclick="switchView('chef')" id="nav-chef" class="nav-btn flex flex-col items-center p-1 w-16">
+            <i class="fas fa-hat-chef text-lg mb-1"></i>
+            <span class="text-[10px] font-medium">Szef AI</span>
+        </button>
+
+        <div class="relative w-14 flex justify-center">
+            <button onclick="switchView('scanner')" id="nav-scanner" class="fab-btn absolute -top-7 w-12 h-12 rounded-full text-white flex items-center justify-center text-xl transition active:scale-95">
+                <i class="fas fa-plus"></i>
             </button>
         </div>
 
-        <!-- Settings -->
-        <button onclick="nav('settings')" id="nav-btn-settings" class="nav-item flex flex-col items-center w-16 pt-2">
-            <i class="fa-solid fa-gear text-xl mb-1"></i>
-            <span class="text-[10px] font-bold">Opcje</span>
+        <button onclick="switchView('settings')" id="nav-settings" class="nav-btn flex flex-col items-center p-1 w-16">
+            <i class="fas fa-cog text-lg mb-1"></i>
+            <span class="text-[10px] font-medium">Opcje</span>
         </button>
     </nav>
 
     <script>
-        /* === STATE & INIT === */
-        let currentBase64 = null;
-        const state = JSON.parse(localStorage.getItem('fitai_state')) || { 
-            kcal: 0, protein: 0, carbs: 0, fat: 0, date: new Date().toDateString() 
-        };
+        // --- STAN APLIKACJI ---
+        let dailyData = JSON.parse(localStorage.getItem('fitai_daily_data')) || { kcal: 0, protein: 0, carbs: 0, fat: 0, date: new Date().toDateString() };
+        let userParams = JSON.parse(localStorage.getItem('fitai_user_params')) || null;
+        let currentImageBase64 = null;
 
-        window.onload = () => {
-            const dateOpts = { weekday: 'long', day: 'numeric', month: 'long' };
-            document.getElementById('date-display').textContent = new Date().toLocaleDateString('pl-PL', dateOpts);
-            
-            if (state.date !== new Date().toDateString()) resetData(false);
-            else updateUI();
+        // Inicjalizacja daty
+        document.getElementById('current-date').textContent = new Date().toLocaleDateString('pl-PL', { weekday: 'long', day: 'numeric', month: 'long' });
 
-            if (localStorage.getItem('fitai_api_key')) {
-                document.getElementById('api-key').placeholder = "Klucz zapisany w urządzeniu";
-            }
-        };
+        if (dailyData.date !== new Date().toDateString()) {
+            resetDailyData(false);
+        } else {
+            updateDashboard();
+        }
 
-        /* === NOTIFICATIONS === */
-        function showToast(msg) {
+        // Sprawdź pierwsze uruchomienie / parametry
+        if (!userParams) {
+            openSetupModal();
+        } else {
+            calculateTargets();
+        }
+
+        function showToast(message) {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             toast.className = 'toast';
-            toast.textContent = msg;
+            toast.textContent = message;
             container.appendChild(toast);
-            setTimeout(() => toast.remove(), 4000);
+            setTimeout(() => { toast.remove(); }, 3500);
         }
 
-        /* === NAVIGATION === */
-        function nav(view) {
+        function switchView(viewName) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-            document.getElementById(`view-${view}`).classList.add('active');
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
             
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            if (view !== 'scanner') {
-                document.getElementById(`nav-btn-${view}`).classList.add('active');
+            document.getElementById(`view-${viewName}`).classList.add('active');
+            if (viewName !== 'scanner') {
+                const btn = document.getElementById(`nav-${viewName}`);
+                if (btn) btn.classList.add('active');
             }
-            window.scrollTo(0,0);
         }
 
-        /* === IMAGE PROCESSING (CANVAS COMPRESSION) === */
-        function processImage(input) {
+        // --- OBSŁUGA PARAMETRÓW I TDEE ---
+        function openSetupModal() {
+            if (userParams) {
+                document.getElementById('user-goal').value = userParams.goal || 'cut';
+                document.getElementById('user-weight').value = userParams.weight || '';
+                document.getElementById('user-height').value = userParams.height || '';
+                document.getElementById('user-age').value = userParams.age || '';
+                document.getElementById('user-gender').value = userParams.gender || 'm';
+                document.getElementById('user-activity').value = userParams.activity || '1.55';
+            }
+            document.getElementById('setup-modal').classList.remove('hidden');
+        }
+
+        function saveUserParams() {
+            const weight = parseFloat(document.getElementById('user-weight').value);
+            const height = parseFloat(document.getElementById('user-height').value);
+            const age = parseInt(document.getElementById('user-age').value);
+            
+            if (!weight || !height || !age) {
+                showToast("Wypełnij wszystkie pola prawidłowo!");
+                return;
+            }
+
+            userParams = {
+                goal: document.getElementById('user-goal').value,
+                weight, height, age,
+                gender: document.getElementById('user-gender').value,
+                activity: parseFloat(document.getElementById('user-activity').value)
+            };
+
+            localStorage.setItem('fitai_user_params', JSON.stringify(userParams));
+            document.getElementById('setup-modal').classList.add('hidden');
+            calculateTargets();
+            showToast("Parametry zapisane!");
+        }
+
+        function calculateTargets() {
+            if (!userParams) return;
+            // Wzór Mifflin-St Jeor
+            let bmr = (10 * userParams.weight) + (6.25 * userParams.height) - (5 * userParams.age);
+            bmr += (userParams.gender === 'm' ? 5 : -161);
+
+            let tdee = bmr * userParams.activity;
+            if (userParams.goal === 'cut') tdee -= 400;
+            if (userParams.goal === 'bulk') tdee += 350;
+
+            userParams.targetKcal = Math.round(tdee);
+            userParams.targetProtein = Math.round(userParams.weight * 2.0); // 2g na kg masy
+            userParams.targetFat = Math.round((userParams.targetKcal * 0.25) / 9); // 25% kalorii z tłuszczu
+            userParams.targetCarbs = Math.round((userParams.targetKcal - (userParams.targetProtein * 4) - (userParams.targetFat * 9)) / 4);
+
+            localStorage.setItem('fitai_user_params', JSON.stringify(userParams));
+            updateDashboard();
+        }
+
+        function updateDashboard() {
+            if (!userParams) return;
+            document.getElementById('total-kcal').textContent = dailyData.kcal;
+            document.getElementById('target-kcal-label').textContent = `/ ${userParams.targetKcal} kcal`;
+            
+            const left = userParams.targetKcal - dailyData.kcal;
+            document.getElementById('left-kcal').textContent = left >= 0 ? `${left} kcal` : `Przekroczono ${Math.abs(left)}`;
+
+            document.getElementById('total-protein').textContent = dailyData.protein;
+            document.getElementById('target-protein').textContent = `cel: ${userParams.targetProtein}g`;
+
+            document.getElementById('total-carbs').textContent = dailyData.carbs;
+            document.getElementById('target-carbs').textContent = `cel: ${userParams.targetCarbs}g`;
+
+            document.getElementById('total-fat').textContent = dailyData.fat;
+            document.getElementById('target-fat').textContent = `cel: ${userParams.targetFat}g`;
+
+            const progress = Math.min((dailyData.kcal / userParams.targetKcal) * 100, 100);
+            document.getElementById('kcal-bar').style.width = `${progress}%`;
+        }
+
+        // --- OBSŁUGA ZDJĘĆ Z KOMPRESJĄ ---
+        function handleImage(input) {
             const file = input.files[0];
             if (!file) return;
 
             const reader = new FileReader();
-            reader.onload = (e) => {
+            reader.onload = function(e) {
                 const img = new Image();
-                img.onload = () => {
-                    // Kompresja obrazu (max 1024px) - Omija limit Payload Too Large
+                img.onload = function() {
                     const canvas = document.createElement('canvas');
-                    let w = img.width; 
-                    let h = img.height;
-                    const MAX_DIM = 1024;
+                    const MAX_SIZE = 1024;
+                    let width = img.width;
+                    let height = img.height;
 
-                    if (w > h && w > MAX_DIM) { h = Math.round((h * MAX_DIM) / w); w = MAX_DIM; } 
-                    else if (h > MAX_DIM) { w = Math.round((w * MAX_DIM) / h); h = MAX_DIM; }
+                    if (width > height && width > MAX_SIZE) {
+                        height *= MAX_SIZE / width;
+                        width = MAX_SIZE;
+                    } else if (height > MAX_SIZE) {
+                        width *= MAX_SIZE / height;
+                        height = MAX_SIZE;
+                    }
 
-                    canvas.width = w; canvas.height = h;
+                    canvas.width = width;
+                    canvas.height = height;
                     const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, w, h);
+                    ctx.drawImage(img, 0, 0, width, height);
 
-                    // Konwersja do base64 z kompresją 80%
-                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
-                    
-                    document.getElementById('preview-img').src = compressedBase64;
-                    document.getElementById('preview-container').classList.remove('hidden');
-                    currentBase64 = compressedBase64;
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                    document.getElementById('image-preview').src = dataUrl;
+                    document.getElementById('image-preview-container').classList.remove('hidden');
+                    currentImageBase64 = dataUrl;
                 };
                 img.src = e.target.result;
             };
@@ -334,43 +498,48 @@
             input.value = '';
         }
 
-        function clearImage() {
-            currentBase64 = null;
-            document.getElementById('preview-container').classList.add('hidden');
+        function removeImage() {
+            currentImageBase64 = null;
+            document.getElementById('image-preview-container').classList.add('hidden');
+            document.getElementById('image-preview').src = '';
         }
 
-        /* === API CALL LOGIC === */
-        async function analyzeMeal() {
-            const textDesc = document.getElementById('scan-input').value.trim();
-            const apiKey = localStorage.getItem('fitai_api_key');
+        // --- ANALIZA POSIŁKU (SKANER) ---
+        async function runAnalysis() {
+            const text = document.getElementById('meal-description').value.trim();
+            const apiKey = localStorage.getItem('gemini_api_key');
             
-            if (!apiKey) return showToast("Przejdź do Opcji i wpisz klucz API.");
-            if (!textDesc && !currentBase64) return showToast("Zrób zdjęcie lub opisz posiłek.");
+            if (!apiKey) {
+                showToast("Wprowadź klucz API w Opcjach!");
+                switchView('settings');
+                return;
+            }
 
-            const btnText = document.querySelector('#scan-btn span');
-            const btnIcon = document.querySelector('#scan-btn i');
-            const loader = document.getElementById('scan-loader');
+            if (!text && !currentImageBase64) {
+                showToast("Dodaj zdjęcie lub opis posiłku.");
+                return;
+            }
+
+            const btnText = document.querySelector('#analyze-btn span');
+            const icon = document.querySelector('#analyze-btn i');
+            const loader = document.getElementById('analyze-loader');
             
             btnText.style.display = 'none';
-            btnIcon.style.display = 'none';
+            icon.style.display = 'none';
             loader.style.display = 'block';
 
             try {
-                // 1. DOKŁADNY URL, O KTÓRY PROSIŁEŚ
                 const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-                
-                // 2. TWARDY, KRÓTKI PROMPT
-                const prompt = `Przeanalizuj posiłek. Zwróć TYLKO kod JSON: {"kcal":0, "protein":0, "carbs":0, "fat":0}. Nic więcej. ${textDesc ? 'Kontekst: ' + textDesc : ''}`;
+                const prompt = `Jesteś ekspertem dietetyki. Przeanalizuj posiłek. Zwróć WYŁĄCZNIE czysty obiekt JSON bez znaczników markdown, w formacie:
+                {"kcal": 0, "protein": 0, "carbs": 0, "fat": 0}
+                Opis posiłku: ${text || "brak"}, uwzględnij widoczne na zdjęciu produkty.`;
 
-                let parts = [{ text: prompt }];
-
-                if (currentBase64) {
-                    // 4. BEZWZGLĘDNE USUNIĘCIE PREFIKSU Z BASE64
-                    const cleanBase64 = currentBase64.replace(/^data:image\/(png|jpeg|jpg);base64,/, '');
+                const parts = [{ text: prompt }];
+                if (currentImageBase64) {
                     parts.push({
                         inlineData: {
                             mimeType: "image/jpeg",
-                            data: cleanBase64
+                            data: currentImageBase64.split(',')[1]
                         }
                     });
                 }
@@ -378,87 +547,126 @@
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ role: "user", parts: parts }],
-                        generationConfig: { responseMimeType: "application/json", temperature: 0.1 }
-                    })
+                    body: JSON.stringify({ contents: [{ role: "user", parts: parts }] })
                 });
 
-                if (!response.ok) {
-                    const errorDetails = await response.json();
-                    throw new Error(errorDetails.error?.message || "Błąd serwera (Status: " + response.status + ")");
-                }
+                if (!response.ok) throw new Error("Błąd sieci lub nieprawidłowy klucz API.");
 
                 const data = await response.json();
-                const responseText = data.candidates[0].content.parts[0].text;
+                const resultText = data.candidates[0].content.parts[0].text;
                 
-                // 3. PARSING PRZEZ REGEX
-                const match = responseText.match(/\{[\s\S]*?\}/);
-                if (!match) throw new Error("Błąd odczytu: AI nie zwróciło JSONa.");
+                const jsonMatch = resultText.match(/\{[\s\S]*?\}/);
+                if (!jsonMatch) throw new Error("Błąd odczytu danych z AI.");
                 
-                const result = JSON.parse(match[0]);
+                const parsed = JSON.parse(jsonMatch[0]);
+                const kcal = Math.round(Number(parsed.kcal) || 0);
+                const protein = Math.round(Number(parsed.protein) || 0);
+                const carbs = Math.round(Number(parsed.carbs) || 0);
+                const fat = Math.round(Number(parsed.fat) || 0);
 
-                state.kcal += Number(result.kcal) || 0;
-                state.protein += Number(result.protein) || 0;
-                state.carbs += Number(result.carbs) || 0;
-                state.fat += Number(result.fat) || 0;
-                
-                localStorage.setItem('fitai_state', JSON.stringify(state));
-                updateUI();
-                showToast(`Dodano ${Number(result.kcal) || 0} kcal!`);
-                
-                document.getElementById('scan-input').value = '';
-                clearImage();
-                nav('dashboard');
+                dailyData.kcal += kcal;
+                dailyData.protein += protein;
+                dailyData.carbs += carbs;
+                dailyData.fat += fat;
+                localStorage.setItem('fitai_daily_data', JSON.stringify(dailyData));
 
-            } catch (err) {
-                console.error(err);
-                if (err.message.includes("API key not valid")) showToast("Klucz API jest niepoprawny.");
-                else showToast("Wystąpił błąd. Spróbuj ponownie.");
+                updateDashboard();
+                showToast(`Dodano: ${kcal} kcal!`);
+                
+                document.getElementById('meal-description').value = '';
+                removeImage();
+                switchView('home');
+
+            } catch (error) {
+                console.error(error);
+                showToast("Wystąpił błąd. Spróbuj ponownie.");
             } finally {
                 btnText.style.display = 'block';
-                btnIcon.style.display = 'block';
+                icon.style.display = 'block';
                 loader.style.display = 'none';
             }
         }
 
-        /* === HELPERS === */
-        function updateUI() {
-            document.getElementById('dash-kcal').textContent = Math.round(state.kcal);
-            document.getElementById('dash-protein').textContent = Math.round(state.protein);
-            document.getElementById('dash-carbs').textContent = Math.round(state.carbs);
-            document.getElementById('dash-fat').textContent = Math.round(state.fat);
-            
-            const progress = Math.min((state.kcal / 2500) * 100, 100);
-            const bar = document.getElementById('dash-bar');
-            bar.style.width = `${progress}%`;
-            
-            if (progress > 100) {
-                bar.classList.replace('from-emerald-400', 'from-rose-500');
-                bar.classList.replace('to-emerald-500', 'to-rose-600');
+        // --- SZEF KUCHNI (GENERATOR PRZEPISÓW) ---
+        async function generateRecipe() {
+            const promptText = document.getElementById('chef-prompt').value.trim();
+            const apiKey = localStorage.getItem('gemini_api_key');
+
+            if (!apiKey) {
+                showToast("Wymagany klucz API w opcjach!");
+                switchView('settings');
+                return;
+            }
+            if (!promptText) {
+                showToast("Wpisz, co masz w lodówce!");
+                return;
+            }
+
+            const btnText = document.querySelector('#chef-btn');
+            const loader = document.getElementById('chef-loader');
+            btnText.style.opacity = '0.7';
+            loader.style.display = 'inline-block';
+
+            try {
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+                const fullPrompt = `Jesteś profesjonalnym szefem kuchni i dietetykiem. Użytkownik podaje składniki/preferencje: "${promptText}". 
+                Stwórz przepis. Zwróć WYŁĄCZNIE obiekt JSON w formacie bez żadnych znaczników markdown:
+                {"title": "Nazwa dania", "kcal": 500, "protein": 35, "carbs": 50, "fat": 15, "steps": "1. Krok pierwszy...\n2. Krok drugi..."}`;
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: fullPrompt }] }] })
+                });
+
+                if (!response.ok) throw new Error("Błąd API");
+
+                const data = await response.json();
+                const text = data.candidates[0].content.parts[0].text;
+                const jsonMatch = text.match(/\{[\s\S]*?\}/);
+                if (!jsonMatch) throw new Error("Błąd formatu");
+
+                const recipe = JSON.parse(jsonMatch[0]);
+                document.getElementById('recipe-title').textContent = recipe.title;
+                document.getElementById('recipe-kcal').textContent = `${recipe.kcal} kcal`;
+                document.getElementById('recipe-macros').textContent = `B: ${recipe.protein}g | W: ${recipe.carbs}g | T: ${recipe.fat}g`;
+                document.getElementById('recipe-steps').textContent = recipe.steps;
+                document.getElementById('recipe-result-container').classList.remove('hidden');
+                showToast("Przepis wygenerowany!");
+
+            } catch (err) {
+                console.error(err);
+                showToast("Nie udało się wygenerować przepisu.");
+            } finally {
+                btnText.style.opacity = '1';
+                loader.style.display = 'none';
             }
         }
 
-        function resetData(manual = true) {
-            if (manual && !confirm("Rozpocząć od zera?")) return;
-            state.kcal = 0; state.protein = 0; state.carbs = 0; state.fat = 0;
-            state.date = new Date().toDateString();
-            localStorage.setItem('fitai_state', JSON.stringify(state));
-            updateUI();
-            if(manual) showToast("Nowy dzień rozpoczęty!");
+        function resetDailyData(manual = true) {
+            if (manual && !confirm("Zresetować dzisiejszy bilans?")) return;
+            dailyData = { kcal: 0, protein: 0, carbs: 0, fat: 0, date: new Date().toDateString() };
+            localStorage.setItem('fitai_daily_data', JSON.stringify(dailyData));
+            updateDashboard();
+            if (manual) showToast("Zresetowano dane.");
         }
 
-        function saveKey() {
-            const key = document.getElementById('api-key').value.trim();
-            if (key.length > 5) {
-                localStorage.setItem('fitai_api_key', key);
-                showToast("Zapisano bezpiecznie!");
-                document.getElementById('api-key').value = '';
-                document.getElementById('api-key').placeholder = "Klucz zapisany w urządzeniu";
+        function saveApiKey() {
+            const key = document.getElementById('api-key-input').value.trim();
+            if (key.length > 10) {
+                localStorage.setItem('gemini_api_key', key);
+                showToast("Klucz zapisany pomyślnie!");
+                document.getElementById('api-key-input').value = '';
             } else {
-                showToast("Wprowadź prawidłowy klucz.");
+                showToast("Wprowadź poprawny klucz API.");
             }
         }
+
+        window.onload = () => {
+            if (localStorage.getItem('gemini_api_key')) {
+                document.getElementById('api-key-input').placeholder = "Klucz jest zapisany w pamięci";
+            }
+        };
     </script>
 </body>
 </html>
