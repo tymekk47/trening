@@ -865,16 +865,16 @@
             const payload = {
                 contents: [{
                     role: "user",
-                    parts: [{ text: `Przeanalizuj posiłek. Zwróć wyłącznie czysty format JSON (bez znaczników markdown typu \`\`\`json). Opis: "${desc || 'brak'}". Oszacuj Kcal i makro (B, W, T) dla CAŁEJ PORCJI (jako liczby całkowite). Zwróć estetyczną nazwę (mealName) oraz krótki werdykt po polsku (evaluation - czy to zdrowe/fit?).` }]
+                    parts: [{ text: `Przeanalizuj posiłek. Zwróć wyłącznie czysty format JSON. Opis: "${desc || 'brak'}". Oszacuj Kcal i makro (B, W, T) dla CAŁEJ PORCJI. Zwróć estetyczną nazwę (mealName) oraz krótki werdykt po polsku (evaluation - czy to zdrowe/fit?).` }]
                 }],
                 generationConfig: {
                     responseMimeType: "application/json",
                     responseSchema: {
                         type: "OBJECT",
                         properties: {
-                            mealName: { type: "STRING" }, calories: { type: "INTEGER" },
-                            protein: { type: "INTEGER" }, carbs: { type: "INTEGER" },
-                            fat: { type: "INTEGER" }, evaluation: { type: "STRING" }
+                            mealName: { type: "STRING" }, calories: { type: "NUMBER" },
+                            protein: { type: "NUMBER" }, carbs: { type: "NUMBER" },
+                            fat: { type: "NUMBER" }, evaluation: { type: "STRING" }
                         },
                         required: ["mealName", "calories", "protein", "carbs", "fat", "evaluation"]
                     }
@@ -899,22 +899,39 @@
                 let jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
                 
                 if (jsonText) {
-                    // Czyszczenie znaczników markdown, które Gemini czasem dorzuca mimo wymuszania JSON Schema
-                    jsonText = jsonText.replace(/```json/gi, '').replace(/```/g, '').trim();
-                    const d = JSON.parse(jsonText);
-                    state.tempMeal = { name: d.mealName, cals: d.calories, p: d.protein, c: d.carbs, f: d.fat, eval: d.evaluation, time: new Date().toLocaleTimeString('pl-PL', {hour:'2-digit', minute:'2-digit'}) };
+                    // Ekstrakcja czystego JSON-a za pomocą regex (odporność na wpadki AI z dodawaniem tekstu)
+                    const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
+                    if (!jsonMatch) throw new Error("Odpowiedź nie zawiera prawidłowego formatu JSON.");
                     
-                    document.getElementById('res-name').innerText = d.mealName; document.getElementById('res-eval').innerText = d.evaluation;
-                    document.getElementById('res-cal').innerText = d.calories; document.getElementById('res-prot').innerText = d.protein + 'g';
-                    document.getElementById('res-carb').innerText = d.carbs + 'g'; document.getElementById('res-fat').innerText = d.fat + 'g';
+                    const d = JSON.parse(jsonMatch[0]);
+                    
+                    // Bezpieczne zaokrąglenia i przypisania
+                    state.tempMeal = { 
+                        name: d.mealName || "Nieznany posiłek", 
+                        cals: Math.round(d.calories || 0), 
+                        p: Math.round(d.protein || 0), 
+                        c: Math.round(d.carbs || 0), 
+                        f: Math.round(d.fat || 0), 
+                        eval: d.evaluation || "Brak oceny", 
+                        time: new Date().toLocaleTimeString('pl-PL', {hour:'2-digit', minute:'2-digit'}) 
+                    };
+                    
+                    document.getElementById('res-name').innerText = state.tempMeal.name; 
+                    document.getElementById('res-eval').innerText = state.tempMeal.eval;
+                    document.getElementById('res-cal').innerText = state.tempMeal.cals; 
+                    document.getElementById('res-prot').innerText = state.tempMeal.p + 'g';
+                    document.getElementById('res-carb').innerText = state.tempMeal.c + 'g'; 
+                    document.getElementById('res-fat').innerText = state.tempMeal.f + 'g';
                     
                     document.getElementById('ai-result').classList.remove('hidden');
                 } else {
-                    throw new Error("Pusta odpowiedź od modelu.");
+                    throw new Error("Pusta odpowiedź lub naruszenie zasad bezpieczeństwa modelu (Safety block).");
                 }
             } catch (e) {
                 console.error("Szczegóły błędu analizy:", e);
-                showToast("Błąd analizy. Spróbuj zmodyfikować opis."); 
+                // Wyświetla prawdziwy błąd jeśli jest krótki, w przeciwnym razie domyślny komunikat
+                const errorMsg = e.message && e.message.length < 100 ? e.message : "Błąd analizy. Zmień opis lub spróbuj ponownie.";
+                showToast("Błąd: " + errorMsg); 
                 document.getElementById('btn-analyze').classList.remove('hidden');
             } finally {
                 document.getElementById('ai-loading').classList.add('hidden'); document.getElementById('ai-loading').classList.remove('flex');
@@ -968,8 +985,8 @@
                         type: "OBJECT",
                         properties: {
                             recipeName: { type: "STRING" }, ingredients: { type: "ARRAY", items: { type: "STRING" } },
-                            instructions: { type: "ARRAY", items: { type: "STRING" } }, calories: { type: "INTEGER" },
-                            protein: { type: "INTEGER" }, carbs: { type: "INTEGER" }, fat: { type: "INTEGER" }
+                            instructions: { type: "ARRAY", items: { type: "STRING" } }, calories: { type: "NUMBER" },
+                            protein: { type: "NUMBER" }, carbs: { type: "NUMBER" }, fat: { type: "NUMBER" }
                         }, required: ["recipeName", "ingredients", "instructions", "calories", "protein", "carbs", "fat"]
                     }
                 }
@@ -980,13 +997,21 @@
                     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
                 });
                 const result = await res.json();
-                const json = result.candidates?.[0]?.content?.parts?.[0]?.text;
                 
-                if(json) {
-                    const d = JSON.parse(json);
-                    document.getElementById('gen-rec-name').innerText = d.recipeName; document.getElementById('gen-rec-cal').innerText = d.calories;
-                    document.getElementById('gen-rec-prot').innerText = d.protein; document.getElementById('gen-rec-carb').innerText = d.carbs;
-                    document.getElementById('gen-rec-fat').innerText = d.fat;
+                if (result.error) throw new Error(result.error.message);
+                
+                const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                
+                if(jsonText) {
+                    const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
+                    if (!jsonMatch) throw new Error();
+                    
+                    const d = JSON.parse(jsonMatch[0]);
+                    document.getElementById('gen-rec-name').innerText = d.recipeName; 
+                    document.getElementById('gen-rec-cal').innerText = Math.round(d.calories || 0);
+                    document.getElementById('gen-rec-prot').innerText = Math.round(d.protein || 0); 
+                    document.getElementById('gen-rec-carb').innerText = Math.round(d.carbs || 0);
+                    document.getElementById('gen-rec-fat').innerText = Math.round(d.fat || 0);
                     
                     const iList = document.getElementById('gen-rec-ingredients'); iList.innerHTML = '';
                     d.ingredients.forEach(i => iList.innerHTML += `<li class="flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-brand-500"></div>${i}</li>`);
@@ -995,9 +1020,11 @@
                     d.instructions.forEach(i => pList.innerHTML += `<li>${i}</li>`);
                     
                     document.getElementById('recipe-result').classList.remove('hidden');
-                } else throw new Error();
+                } else throw new Error("Pusta odpowiedź z modelu");
             } catch (e) {
-                showToast("Błąd przy tworzeniu przepisu."); document.getElementById('btn-generate-recipe').classList.remove('hidden');
+                console.error(e);
+                showToast("Błąd przy tworzeniu przepisu."); 
+                document.getElementById('btn-generate-recipe').classList.remove('hidden');
             } finally {
                 document.getElementById('recipe-loading').classList.add('hidden'); document.getElementById('recipe-loading').classList.remove('flex');
             }
