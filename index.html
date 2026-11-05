@@ -299,7 +299,7 @@
 
         <div class="glass-panel p-4 mb-4">
             <label class="text-xs font-semibold text-green-400 block mb-2"><i class="fas fa-key mr-1"></i> Klucz Gemini API</label>
-            <input type="password" id="api-key-input" placeholder="AIzaSy..." class="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-3.5 py-3 text-white text-xs focus:outline-none focus:border-green-500 mb-3">
+            <input type="password" id="api-key-input" placeholder="Wklej klucz..." class="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-3.5 py-3 text-white text-xs focus:outline-none focus:border-green-500 mb-3">
             <button onclick="saveApiKey()" class="w-full bg-green-500 hover:bg-green-400 text-black font-bold py-3 rounded-xl transition text-xs">
                 Zapisz Klucz Bezpiecznie
             </button>
@@ -516,7 +516,8 @@
             loader.style.display = 'block';
 
             try {
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+                // Użycie nagłówka x-goog-api-key zamiast klucza w adresie URL
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`;
                 const prompt = `Jesteś ekspertem dietetyki. Przeanalizuj posiłek. Zwróć WYŁĄCZNIE czysty obiekt JSON bez znaczników markdown, w formacie:
                 {"kcal": 0, "protein": 0, "carbs": 0, "fat": 0}
                 Opis posiłku: ${text || "brak"}, uwzględnij widoczne na zdjęciu produkty.`;
@@ -533,11 +534,14 @@
 
                 const response = await fetch(url, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'x-goog-api-key': apiKey 
+                    },
                     body: JSON.stringify({ contents: [{ role: "user", parts: parts }] })
                 });
 
-                if (!response.ok) throw new Error("Błąd sieci lub nieprawidłowy klucz API.");
+                if (!response.ok) throw new Error("Błąd autoryzacji lub sieci.");
 
                 const data = await response.json();
                 const resultText = data.candidates[0].content.parts[0].text;
@@ -594,14 +598,17 @@
             loader.style.display = 'inline-block';
 
             try {
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`;
                 const fullPrompt = `Jesteś profesjonalnym szefem kuchni i dietetykiem. Użytkownik podaje składniki/preferencje: "${promptText}". 
                 Stwórz przepis. Zwróć WYŁĄCZNIE obiekt JSON w formacie bez żadnych znaczników markdown:
                 {"title": "Nazwa dania", "kcal": 500, "protein": 35, "carbs": 50, "fat": 15, "steps": "1. Krok pierwszy...\n2. Krok drugi..."}`;
 
                 const response = await fetch(url, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'x-goog-api-key': apiKey 
+                    },
                     body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: fullPrompt }] }] })
                 });
 
@@ -639,7 +646,7 @@
 
         function saveApiKey() {
             const key = document.getElementById('api-key-input').value.trim();
-            if (key.length > 10) {
+            if (key.length > 5) {
                 localStorage.setItem('gemini_api_key', key);
                 showToast("Klucz zapisany pomyślnie!");
                 document.getElementById('api-key-input').value = '';
