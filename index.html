@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <!-- Meta tagi dla PWA / iOS -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="DietAI">
@@ -21,23 +20,10 @@
             theme: {
                 extend: {
                     colors: {
-                        brand: {
-                            50: '#f0fdfa',
-                            100: '#ccfbf1',
-                            400: '#2dd4bf',
-                            500: '#14b8a6',
-                            600: '#0d9488',
-                            900: '#134e4a',
-                        },
-                        darkbase: {
-                            800: '#1e293b',
-                            900: '#0f172a',
-                            950: '#020617',
-                        }
+                        brand: { 50: '#f0fdfa', 100: '#ccfbf1', 400: '#2dd4bf', 500: '#14b8a6', 600: '#0d9488', 900: '#134e4a' },
+                        darkbase: { 800: '#1e293b', 900: '#0f172a', 950: '#020617' }
                     },
-                    fontFamily: {
-                        sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'sans-serif'],
-                    }
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
                 }
             }
         }
@@ -45,59 +31,20 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
         
-        body {
-            -webkit-tap-highlight-color: transparent;
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-        body::-webkit-scrollbar {
-            display: none;
-        }
+        body { -webkit-tap-highlight-color: transparent; scrollbar-width: none; }
+        body::-webkit-scrollbar { display: none; }
         
         /* Glassmorphism */
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-        }
-        .dark .glass-panel {
-            background: rgba(30, 41, 59, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
+        .glass-panel { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.4); }
+        .dark .glass-panel { background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.05); }
 
-        .glass-card {
-            background: linear-gradient(145deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.6) 100%);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-        }
-        .dark .glass-card {
-            background: linear-gradient(145deg, rgba(30,41,59,0.9) 0%, rgba(15,23,42,0.8) 100%);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
+        .glass-card { background: linear-gradient(145deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.6) 100%); backdrop-filter: blur(10px); box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05); border: 1px solid rgba(255, 255, 255, 0.5); }
+        .dark .glass-card { background: linear-gradient(145deg, rgba(30,41,59,0.9) 0%, rgba(15,23,42,0.8) 100%); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.05); }
 
         /* Animations */
-        .screen-fade {
-            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .screen-fade.hidden-screen {
-            opacity: 0;
-            transform: scale(0.96) translateY(10px);
-            pointer-events: none;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            visibility: hidden;
-        }
-        .screen-fade.active-screen {
-            opacity: 1;
-            transform: scale(1) translateY(0);
-            position: relative;
-            visibility: visible;
-        }
+        .screen-fade { transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .screen-fade.hidden-screen { opacity: 0; transform: scale(0.96) translateY(10px); pointer-events: none; position: absolute; top: 0; left: 0; width: 100%; visibility: hidden; }
+        .screen-fade.active-screen { opacity: 1; transform: scale(1) translateY(0); position: relative; visibility: visible; }
 
         /* SVG Circular Progress */
         .circular-chart { display: block; margin: 0 auto; max-width: 80%; max-height: 250px; }
@@ -106,7 +53,7 @@
         .circle { fill: none; stroke-width: 3.5; stroke-linecap: round; transition: stroke-dasharray 1s ease-out, stroke 0.5s ease; }
     </style>
 </head>
-<body class="bg-slate-50 dark:bg-darkbase-900 text-slate-900 dark:text-slate-50 h-[100dvh] w-full overflow-hidden flex transition-colors duration-300 selection:bg-brand-500 selection:text-white">
+<body class="bg-slate-50 dark:bg-darkbase-900 text-slate-900 dark:text-slate-50 h-[100dvh] w-full overflow-hidden flex transition-colors duration-300">
 
     <!-- Toast Notification -->
     <div id="toast" class="fixed top-[max(4.5rem,env(safe-area-inset-top))] left-1/2 transform -translate-x-1/2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-6 py-3 rounded-full shadow-2xl z-50 transition-all duration-400 opacity-0 pointer-events-none flex items-center gap-3 glass-panel">
@@ -120,855 +67,297 @@
             <div class="w-12 h-12 bg-gradient-to-br from-brand-400 to-brand-600 rounded-2xl flex items-center justify-center shadow-lg shadow-brand-500/30">
                 <i class="ph-fill ph-barbell text-2xl text-white"></i>
             </div>
-            <h1 class="text-2xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-slate-400">DietAI</h1>
+            <h1 class="text-2xl font-extrabold tracking-tight">DietAI</h1>
         </div>
         
         <nav class="flex-1 px-4 space-y-2 mt-4">
-            <button onclick="navTo('dashboard')" id="side-nav-dashboard" class="w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all font-semibold">
-                <i class="ph ph-house text-2xl"></i> Dashboard
-            </button>
-            <button onclick="navTo('add-meal')" id="side-nav-add" class="w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all font-semibold">
-                <i class="ph ph-camera-plus text-2xl"></i> Skaner AI
-            </button>
-            <button onclick="navTo('recipes')" id="side-nav-recipes" class="w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all font-semibold">
-                <i class="ph ph-magic-wand text-2xl"></i> Szef Kuchni
-            </button>
-            <button onclick="navTo('settings')" id="side-nav-settings" class="w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all font-semibold">
-                <i class="ph ph-gear text-2xl"></i> Ustawienia
-            </button>
+            <button onclick="navTo('dashboard')" id="side-nav-dashboard" class="w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-slate-500 font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"><i class="ph ph-house text-2xl"></i> Dashboard</button>
+            <button onclick="navTo('add-meal')" id="side-nav-add" class="w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-slate-500 font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"><i class="ph ph-camera-plus text-2xl"></i> Skaner AI</button>
+            <button onclick="navTo('recipes')" id="side-nav-recipes" class="w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-slate-500 font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"><i class="ph ph-magic-wand text-2xl"></i> Szef Kuchni</button>
+            <button onclick="navTo('settings')" id="side-nav-settings" class="w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-slate-500 font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"><i class="ph ph-gear text-2xl"></i> Ustawienia</button>
         </nav>
-
-        <div class="p-6">
-            <div class="glass-card rounded-2xl p-4 flex items-center justify-between">
-                <span class="text-sm font-semibold text-slate-600 dark:text-slate-300">Tryb ciemny</span>
-                <button onclick="toggleDarkMode()" class="w-12 h-6 rounded-full bg-slate-300 dark:bg-brand-500 relative transition-colors duration-300 focus:outline-none">
-                    <div id="desktop-theme-knob" class="w-5 h-5 bg-white rounded-full absolute top-0.5 left-0.5 transition-transform duration-300 transform dark:translate-x-6 shadow-sm"></div>
-                </button>
-            </div>
-        </div>
     </aside>
 
     <!-- Main Content Area -->
     <main class="flex-1 overflow-y-auto w-full relative z-10 pt-[env(safe-area-inset-top)] pb-[calc(100px+env(safe-area-inset-bottom))] md:pb-0" id="main-container">
         <div class="max-w-xl mx-auto h-full relative">
             
-            <!-- ================= EKRAN 1: KONFIGURACJA ================= -->
+            <!-- VIEW: SETUP -->
             <section id="view-setup" class="screen-fade active-screen p-6 min-h-full flex flex-col justify-center">
                 <div class="text-center mb-10">
-                    <div class="w-20 h-20 bg-gradient-to-br from-brand-400 to-brand-600 rounded-[32px] mx-auto flex items-center justify-center shadow-2xl shadow-brand-500/40 mb-6 transform rotate-3 hover:rotate-0 transition-transform">
-                        <i class="ph-fill ph-barbell text-4xl text-white"></i>
-                    </div>
+                    <div class="w-20 h-20 bg-gradient-to-br from-brand-400 to-brand-600 rounded-[32px] mx-auto flex items-center justify-center mb-6"><i class="ph-fill ph-barbell text-4xl text-white"></i></div>
                     <h1 class="text-3xl font-extrabold tracking-tight">Profil Sportowca</h1>
-                    <p class="text-slate-500 dark:text-slate-400 text-sm mt-3 font-medium">Zbudujmy plan idealnie dopasowany do Twojego ciała.</p>
                 </div>
-
                 <form id="setup-form" class="space-y-5">
                     <div class="grid grid-cols-2 gap-5">
-                        <div class="glass-card rounded-2xl p-1">
-                            <select id="s-gender" class="w-full bg-transparent px-4 py-3 outline-none font-semibold text-slate-700 dark:text-slate-200 appearance-none text-center cursor-pointer">
-                                <option value="male" class="text-slate-900">Mężczyzna</option>
-                                <option value="female" class="text-slate-900">Kobieta</option>
-                            </select>
-                        </div>
-                        <div class="glass-card rounded-2xl relative overflow-hidden flex items-center">
-                            <input type="number" id="s-age" placeholder="Wiek" required min="10" max="100" class="w-full bg-transparent px-4 py-3 outline-none font-semibold text-slate-700 dark:text-slate-200 placeholder-slate-400 text-center z-10">
-                        </div>
+                        <select id="s-gender" class="glass-card rounded-2xl px-4 py-4 w-full outline-none text-center font-semibold text-slate-900 dark:text-white"><option value="male" class="text-black">Mężczyzna</option><option value="female" class="text-black">Kobieta</option></select>
+                        <input type="number" id="s-age" placeholder="Wiek" required min="10" max="100" class="glass-card rounded-2xl px-4 py-4 w-full outline-none text-center font-semibold bg-transparent placeholder-slate-500 text-slate-900 dark:text-white">
                     </div>
-
                     <div class="grid grid-cols-2 gap-5">
-                        <div class="glass-card rounded-2xl relative">
-                            <input type="number" id="s-weight" placeholder="Waga (kg)" required min="30" max="250" class="w-full bg-transparent px-4 py-3 outline-none font-semibold text-slate-700 dark:text-slate-200 placeholder-slate-400 text-center">
-                        </div>
-                        <div class="glass-card rounded-2xl relative">
-                            <input type="number" id="s-height" placeholder="Wzrost (cm)" required min="100" max="250" class="w-full bg-transparent px-4 py-3 outline-none font-semibold text-slate-700 dark:text-slate-200 placeholder-slate-400 text-center">
-                        </div>
+                        <input type="number" id="s-weight" placeholder="Waga (kg)" required class="glass-card rounded-2xl px-4 py-4 w-full outline-none text-center font-semibold bg-transparent placeholder-slate-500 text-slate-900 dark:text-white">
+                        <input type="number" id="s-height" placeholder="Wzrost (cm)" required class="glass-card rounded-2xl px-4 py-4 w-full outline-none text-center font-semibold bg-transparent placeholder-slate-500 text-slate-900 dark:text-white">
                     </div>
-
-                    <div class="glass-card rounded-2xl p-1 relative">
-                        <label class="absolute -top-2 left-4 px-1 bg-slate-50 dark:bg-darkbase-900 text-[10px] font-bold uppercase tracking-wider text-brand-500 rounded-sm">Aktywność</label>
-                        <select id="s-activity" class="w-full bg-transparent px-4 py-3 outline-none font-semibold text-slate-700 dark:text-slate-200 cursor-pointer">
-                            <option value="1.2" class="text-slate-900">Siedzący tryb życia</option>
-                            <option value="1.375" class="text-slate-900">Lekka (trening 1-3x w tyg)</option>
-                            <option value="1.55" selected class="text-slate-900">Średnia (trening 3-5x w tyg)</option>
-                            <option value="1.725" class="text-slate-900">Wysoka (trening 6-7x w tyg)</option>
-                            <option value="1.9" class="text-slate-900">Zawodowiec (ciężka praca fizyczna)</option>
-                        </select>
-                    </div>
-
-                    <div class="glass-card rounded-2xl p-1 relative">
-                        <label class="absolute -top-2 left-4 px-1 bg-slate-50 dark:bg-darkbase-900 text-[10px] font-bold uppercase tracking-wider text-brand-500 rounded-sm">Twój Cel</label>
-                        <select id="s-goal" class="w-full bg-transparent px-4 py-3 outline-none font-semibold text-slate-700 dark:text-slate-200 cursor-pointer">
-                            <option value="-500" class="text-slate-900">Redukcja (-500 kcal)</option>
-                            <option value="0" selected class="text-slate-900">Utrzymanie wagi</option>
-                            <option value="300" class="text-slate-900">Budowa masy (+300 kcal)</option>
-                        </select>
-                    </div>
-
-                    <button type="submit" class="w-full bg-gradient-to-r from-brand-500 to-brand-600 text-white rounded-2xl py-4 font-bold shadow-lg shadow-brand-500/30 hover:shadow-brand-500/50 hover:scale-[1.02] transition-all mt-6 text-lg tracking-wide">
-                        Generuj Plan
-                    </button>
+                    <select id="s-activity" class="glass-card rounded-2xl px-4 py-4 w-full outline-none text-center font-semibold text-slate-900 dark:text-white"><option value="1.2" class="text-black">Siedzący tryb</option><option value="1.55" selected class="text-black">Średnia (3-5x w tyg)</option><option value="1.9" class="text-black">Zawodowiec</option></select>
+                    <select id="s-goal" class="glass-card rounded-2xl px-4 py-4 w-full outline-none text-center font-semibold text-slate-900 dark:text-white"><option value="-500" class="text-black">Redukcja</option><option value="0" selected class="text-black">Utrzymanie</option><option value="300" class="text-black">Budowa masy</option></select>
+                    <button type="submit" class="w-full bg-gradient-to-r from-brand-500 to-brand-600 text-white rounded-2xl py-4 font-bold mt-6">Generuj Plan</button>
                 </form>
             </section>
 
-            <!-- ================= EKRAN 2: DASHBOARD ================= -->
+            <!-- VIEW: DASHBOARD -->
             <section id="view-dashboard" class="screen-fade hidden-screen p-6 md:p-10">
                 <header class="flex justify-between items-end mb-8 pt-2">
-                    <div>
-                        <h2 class="text-3xl font-extrabold tracking-tight">Przegląd</h2>
-                        <p id="current-date" class="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1 capitalize"></p>
-                    </div>
-                    <button onclick="resetDaily()" class="w-12 h-12 glass-card rounded-2xl flex items-center justify-center text-slate-400 hover:text-red-500 hover:border-red-200 dark:hover:border-red-900/50 transition-all shadow-sm">
-                        <i class="ph-bold ph-arrow-counter-clockwise text-xl"></i>
-                    </button>
+                    <div><h2 class="text-3xl font-extrabold tracking-tight">Przegląd</h2><p id="current-date" class="text-sm font-medium text-slate-500 mt-1 capitalize"></p></div>
+                    <button onclick="resetDaily()" class="w-12 h-12 glass-card rounded-2xl flex flex-col items-center justify-center text-slate-400"><i class="ph-bold ph-arrow-counter-clockwise text-xl"></i></button>
                 </header>
 
-                <!-- Kółko kalorii -->
-                <div class="glass-card rounded-[2rem] p-8 mb-8 relative overflow-hidden group">
-                    <div class="absolute top-0 right-0 w-32 h-32 bg-brand-500/10 rounded-full blur-3xl -mr-10 -mt-10 transition-transform group-hover:scale-150"></div>
-                    
-                    <div class="relative w-full aspect-square max-w-[260px] mx-auto flex items-center justify-center">
-                        <svg viewBox="0 0 36 36" class="circular-chart w-full h-full absolute inset-0 drop-shadow-md">
+                <div class="glass-card rounded-[2rem] p-8 mb-8 relative">
+                    <div class="relative w-full aspect-square max-w-[240px] mx-auto flex items-center justify-center">
+                        <svg viewBox="0 0 36 36" class="circular-chart w-full h-full absolute inset-0">
                             <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                            <path class="circle stroke-brand-500 dark:stroke-brand-400" id="cal-progress-ring" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <path class="circle stroke-brand-500" id="cal-progress-ring" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                         </svg>
-                        <div class="text-center z-10 flex flex-col items-center mt-2">
-                            <span id="cal-remaining" class="text-5xl font-black tracking-tighter text-slate-900 dark:text-white">0</span>
-                            <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-2">Kcal Pozostało</span>
-                        </div>
-                    </div>
-                    
-                    <div class="flex justify-between mt-8 px-2 text-center relative z-10">
-                        <div class="bg-white/50 dark:bg-slate-800/50 rounded-2xl p-3 w-[45%] backdrop-blur-sm">
-                            <p class="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-bold tracking-wider mb-1">Spożyte</p>
-                            <p id="cal-consumed" class="font-extrabold text-xl text-slate-800 dark:text-slate-200">0</p>
-                        </div>
-                        <div class="bg-white/50 dark:bg-slate-800/50 rounded-2xl p-3 w-[45%] backdrop-blur-sm">
-                            <p class="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-bold tracking-wider mb-1">Twój Cel</p>
-                            <p id="cal-target" class="font-extrabold text-xl text-slate-800 dark:text-slate-200">0</p>
+                        <div class="text-center z-10">
+                            <span id="cal-remaining" class="text-5xl font-black text-slate-900 dark:text-white">0</span>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Kcal Pozostało</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Makroskładniki -->
-                <div class="glass-card rounded-[2rem] p-6 md:p-8 mb-10 space-y-6">
-                    <h3 class="font-extrabold text-xl mb-4">Makroskładniki</h3>
-                    
-                    <!-- Białko -->
-                    <div class="group">
-                        <div class="flex justify-between text-sm mb-2 font-semibold">
-                            <span class="text-slate-700 dark:text-slate-200 flex items-center gap-2">
-                                <i class="ph-fill ph-egg text-indigo-500"></i> Białko 
-                                <span class="text-slate-400 dark:text-slate-500 text-xs font-medium">(<span id="prot-consumed">0</span>/<span id="prot-target">0</span>g)</span>
-                            </span>
-                            <span id="prot-left" class="text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50 dark:bg-indigo-500/10 px-2 py-0.5 rounded-md">0g zostało</span>
+                <div class="glass-card rounded-[2rem] p-6 mb-10 space-y-6">
+                    <h3 class="font-extrabold text-xl mb-2">Makroskładniki</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between text-sm mb-1 font-semibold"><span class="text-indigo-500">Białko</span><span id="prot-text">0/0g</span></div>
+                            <div class="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-2"><div id="bar-prot" class="bg-indigo-500 h-full rounded-full" style="width: 0%"></div></div>
                         </div>
-                        <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-3 overflow-hidden shadow-inner">
-                            <div id="bar-prot" class="bg-gradient-to-r from-indigo-400 to-indigo-600 h-full rounded-full transition-all duration-1000 ease-out relative" style="width: 0%">
-                                <div class="absolute top-0 left-0 w-full h-full bg-white/20"></div>
-                            </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-1 font-semibold"><span class="text-amber-500">Węgle</span><span id="carb-text">0/0g</span></div>
+                            <div class="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-2"><div id="bar-carb" class="bg-amber-500 h-full rounded-full" style="width: 0%"></div></div>
                         </div>
-                    </div>
-
-                    <!-- Węglowodany -->
-                    <div class="group">
-                        <div class="flex justify-between text-sm mb-2 font-semibold">
-                            <span class="text-slate-700 dark:text-slate-200 flex items-center gap-2">
-                                <i class="ph-fill ph-grains text-amber-500"></i> Węgle 
-                                <span class="text-slate-400 dark:text-slate-500 text-xs font-medium">(<span id="carb-consumed">0</span>/<span id="carb-target">0</span>g)</span>
-                            </span>
-                            <span id="carb-left" class="text-amber-600 dark:text-amber-400 font-bold bg-amber-50 dark:bg-amber-500/10 px-2 py-0.5 rounded-md">0g zostało</span>
-                        </div>
-                        <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-3 overflow-hidden shadow-inner">
-                            <div id="bar-carb" class="bg-gradient-to-r from-amber-400 to-amber-500 h-full rounded-full transition-all duration-1000 ease-out relative" style="width: 0%">
-                                <div class="absolute top-0 left-0 w-full h-full bg-white/20"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Tłuszcze -->
-                    <div class="group">
-                        <div class="flex justify-between text-sm mb-2 font-semibold">
-                            <span class="text-slate-700 dark:text-slate-200 flex items-center gap-2">
-                                <i class="ph-fill ph-drop text-rose-500"></i> Tłuszcze 
-                                <span class="text-slate-400 dark:text-slate-500 text-xs font-medium">(<span id="fat-consumed">0</span>/<span id="fat-target">0</span>g)</span>
-                            </span>
-                            <span id="fat-left" class="text-rose-600 dark:text-rose-400 font-bold bg-rose-50 dark:bg-rose-500/10 px-2 py-0.5 rounded-md">0g zostało</span>
-                        </div>
-                        <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-3 overflow-hidden shadow-inner">
-                            <div id="bar-fat" class="bg-gradient-to-r from-rose-400 to-rose-600 h-full rounded-full transition-all duration-1000 ease-out relative" style="width: 0%">
-                                <div class="absolute top-0 left-0 w-full h-full bg-white/20"></div>
-                            </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-1 font-semibold"><span class="text-rose-500">Tłuszcze</span><span id="fat-text">0/0g</span></div>
+                            <div class="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-2"><div id="bar-fat" class="bg-rose-500 h-full rounded-full" style="width: 0%"></div></div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Lista dzisiejszych posiłków -->
-                <div class="mb-4">
-                    <div class="flex justify-between items-end mb-5">
-                        <h3 class="font-extrabold text-xl">Historia Dnia</h3>
-                        <span class="text-xs font-bold text-brand-500 uppercase tracking-wider">Oś czasu</span>
-                    </div>
-                    <div id="meals-list" class="space-y-4">
-                        <p class="text-slate-400 dark:text-slate-500 text-sm text-center py-6 font-medium glass-card rounded-2xl" id="empty-meals-msg">Czysta karta. Zjedz coś dobrego!</p>
-                    </div>
-                </div>
+                <h3 class="font-extrabold text-xl mb-4">Historia Dnia</h3>
+                <div id="meals-list" class="space-y-4"></div>
             </section>
 
-            <!-- ================= EKRAN 3: DODAJ POSIŁEK (SKANER AI) ================= -->
+            <!-- VIEW: SCANNER -->
             <section id="view-add-meal" class="screen-fade hidden-screen p-6 md:p-10">
                 <header class="pt-2 mb-8">
                     <h2 class="text-3xl font-extrabold tracking-tight">Skaner Posiłku</h2>
-                    <p class="text-sm font-medium text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">Sztuczna inteligencja Gemini błyskawicznie oceni Twój posiłek i wyliczy makroskładniki.</p>
+                    <p class="text-sm font-medium text-slate-500 mt-2">Sztuczna inteligencja Gemini błyskawicznie oceni Twój posiłek.</p>
                 </header>
 
                 <div class="space-y-6">
-                    <!-- Przyciski wyboru zdjęcia -->
                     <div id="image-action-buttons" class="grid grid-cols-2 gap-4">
-                        <!-- Aparat (wymusza kamerę na mobile) -->
-                        <button onclick="document.getElementById('meal-camera').click()" class="glass-card flex flex-col items-center justify-center p-6 rounded-3xl border-2 border-transparent hover:border-brand-400 dark:hover:border-brand-500 transition-all group">
-                            <div class="w-14 h-14 bg-brand-50 dark:bg-brand-500/10 text-brand-500 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                                <i class="ph-fill ph-camera text-2xl"></i>
-                            </div>
-                            <span class="text-sm font-bold text-slate-800 dark:text-slate-200">Zrób zdjęcie</span>
-                        </button>
-                        
-                        <!-- Galeria -->
-                        <button onclick="document.getElementById('meal-gallery').click()" class="glass-card flex flex-col items-center justify-center p-6 rounded-3xl border-2 border-transparent hover:border-indigo-400 dark:hover:border-indigo-500 transition-all group">
-                            <div class="w-14 h-14 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-500 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                                <i class="ph-fill ph-image-square text-2xl"></i>
-                            </div>
-                            <span class="text-sm font-bold text-slate-800 dark:text-slate-200">Wybierz z galerii</span>
-                        </button>
+                        <button onclick="document.getElementById('meal-camera').click()" class="glass-card flex flex-col items-center p-6 rounded-3xl"><i class="ph-fill ph-camera text-3xl text-brand-500 mb-2"></i><span class="text-sm font-bold">Zrób zdjęcie</span></button>
+                        <button onclick="document.getElementById('meal-gallery').click()" class="glass-card flex flex-col items-center p-6 rounded-3xl"><i class="ph-fill ph-image-square text-3xl text-indigo-500 mb-2"></i><span class="text-sm font-bold">Z galerii</span></button>
                     </div>
 
-                    <!-- Ukryte inputy -->
                     <input type="file" id="meal-camera" accept="image/*" capture="environment" class="hidden" onchange="handleImageSelect(event)">
                     <input type="file" id="meal-gallery" accept="image/*" class="hidden" onchange="handleImageSelect(event)">
 
-                    <!-- Podgląd wybranego zdjęcia -->
-                    <div id="image-preview-container" class="hidden relative w-full h-64 rounded-3xl overflow-hidden shadow-lg border border-slate-200 dark:border-slate-700">
-                        <img id="image-preview" class="w-full h-full object-cover" alt="Podgląd posiłku">
-                        <button onclick="resetImageSelection()" class="absolute top-3 right-3 w-10 h-10 bg-black/50 backdrop-blur-md rounded-full text-white flex items-center justify-center hover:bg-red-500 transition-colors">
-                            <i class="ph-bold ph-x text-lg"></i>
-                        </button>
+                    <div id="image-preview-container" class="hidden relative w-full h-64 rounded-3xl overflow-hidden border border-slate-700">
+                        <img id="image-preview" class="w-full h-full object-cover">
+                        <button onclick="resetScanner()" class="absolute top-3 right-3 w-10 h-10 bg-black/50 rounded-full text-white flex items-center justify-center"><i class="ph-bold ph-x text-lg"></i></button>
                     </div>
 
-                    <!-- Text Context Area -->
-                    <div class="glass-card p-4 rounded-3xl">
-                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-3 ml-2">Kontekst (Opcjonalnie)</label>
-                        <textarea id="meal-desc" rows="2" placeholder="Np. Frytki z Aviko, 200g kurczaka, sos czosnkowy..." class="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 rounded-2xl p-4 outline-none focus:ring-2 focus:ring-brand-500 dark:focus:ring-brand-400 transition-all resize-none text-sm font-medium placeholder-slate-400"></textarea>
-                    </div>
+                    <textarea id="meal-desc" rows="2" placeholder="Opisz posiłek (Opcjonalnie przy zdjęciu, wymagane bez zdjęcia)..." class="w-full glass-card border border-slate-200 dark:border-slate-700/50 rounded-2xl p-4 outline-none text-sm font-medium text-slate-900 dark:text-white bg-transparent"></textarea>
 
-                    <!-- Action Button -->
-                    <button id="btn-analyze" onclick="analyzeMeal()" class="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl py-4 font-extrabold shadow-xl hover:scale-[1.02] transition-transform flex items-center justify-center gap-3 text-lg">
-                        <i class="ph-fill ph-sparkle text-xl text-brand-400 dark:text-brand-500"></i>
-                        <span>Analizuj z AI</span>
-                    </button>
+                    <button id="btn-analyze" onclick="analyzeMeal()" class="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl py-4 font-extrabold shadow-xl flex items-center justify-center gap-2"><i class="ph-fill ph-sparkle text-brand-400"></i> Analizuj z AI</button>
 
-                    <!-- Loading State -->
-                    <div id="ai-loading" class="hidden flex-col items-center justify-center py-10 glass-card rounded-3xl border border-brand-200 dark:border-brand-900/50">
-                        <div class="relative w-16 h-16 flex items-center justify-center mb-4">
-                            <div class="absolute inset-0 rounded-full border-t-2 border-brand-500 animate-spin"></div>
-                            <div class="absolute inset-2 rounded-full border-r-2 border-indigo-500 animate-spin opacity-70" style="animation-direction: reverse; animation-duration: 1.5s;"></div>
-                            <i class="ph-fill ph-brain text-2xl text-slate-400 animate-pulse"></i>
-                        </div>
-                        <p class="text-brand-600 dark:text-brand-400 font-bold animate-pulse tracking-wide">Gemini analizuje talerz...</p>
-                    </div>
+                    <div id="ai-loading" class="hidden flex-col items-center py-10"><i class="ph-fill ph-brain text-4xl text-brand-500 animate-pulse mb-3"></i><p class="font-bold text-brand-500">Analizowanie...</p></div>
 
-                    <!-- Wynik AI -->
-                    <div id="ai-result" class="hidden glass-card rounded-[2rem] p-6 shadow-xl border border-brand-200 dark:border-brand-900 overflow-hidden relative">
-                        <div class="absolute top-0 right-0 w-32 h-32 bg-brand-500/10 rounded-full blur-3xl -mr-10 -mt-10"></div>
-                        
-                        <h3 id="res-name" class="font-black text-2xl mb-1 capitalize text-slate-900 dark:text-white relative z-10">Nazwa</h3>
-                        <p id="res-eval" class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-6 italic border-l-2 border-brand-500 pl-3 py-1 relative z-10">Ocena...</p>
-                        
-                        <div class="grid grid-cols-4 gap-3 text-center mb-8 relative z-10">
-                            <div class="bg-slate-100 dark:bg-slate-800/80 rounded-2xl p-3 shadow-inner">
-                                <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Kcal</p>
-                                <p id="res-cal" class="font-black text-lg text-slate-800 dark:text-slate-200">0</p>
-                            </div>
-                            <div class="bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl p-3 shadow-inner">
-                                <p class="text-[10px] font-bold uppercase tracking-wider text-indigo-400 mb-1">Białko</p>
-                                <p id="res-prot" class="font-black text-lg text-indigo-600 dark:text-indigo-400">0g</p>
-                            </div>
-                            <div class="bg-amber-50 dark:bg-amber-900/20 rounded-2xl p-3 shadow-inner">
-                                <p class="text-[10px] font-bold uppercase tracking-wider text-amber-500 mb-1">Węgle</p>
-                                <p id="res-carb" class="font-black text-lg text-amber-600 dark:text-amber-400">0g</p>
-                            </div>
-                            <div class="bg-rose-50 dark:bg-rose-900/20 rounded-2xl p-3 shadow-inner">
-                                <p class="text-[10px] font-bold uppercase tracking-wider text-rose-400 mb-1">Tłuszcz</p>
-                                <p id="res-fat" class="font-black text-lg text-rose-600 dark:text-rose-400">0g</p>
-                            </div>
+                    <div id="ai-result" class="hidden glass-card rounded-[2rem] p-6 shadow-xl border border-brand-200">
+                        <h3 id="res-name" class="font-black text-2xl mb-1 text-slate-900 dark:text-white">Nazwa</h3>
+                        <p id="res-eval" class="text-sm text-slate-500 mb-6">Ocena</p>
+                        <div class="grid grid-cols-4 gap-3 text-center mb-6">
+                            <div class="bg-slate-100 dark:bg-slate-800 rounded-xl p-2"><p class="text-[10px] font-bold text-slate-400">Kcal</p><p id="res-cal" class="font-black text-slate-900 dark:text-white">0</p></div>
+                            <div class="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-2"><p class="text-[10px] font-bold text-indigo-400">Białko</p><p id="res-prot" class="font-black text-indigo-600 dark:text-indigo-400">0</p></div>
+                            <div class="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-2"><p class="text-[10px] font-bold text-amber-500">Węgle</p><p id="res-carb" class="font-black text-amber-600 dark:text-amber-400">0</p></div>
+                            <div class="bg-rose-50 dark:bg-rose-900/20 rounded-xl p-2"><p class="text-[10px] font-bold text-rose-400">Tłuszcz</p><p id="res-fat" class="font-black text-rose-600 dark:text-rose-400">0</p></div>
                         </div>
-                        <div class="flex gap-3 relative z-10">
-                            <button onclick="confirmAddMeal()" class="flex-1 bg-gradient-to-r from-brand-500 to-brand-600 text-white rounded-xl py-3.5 font-bold shadow-lg shadow-brand-500/30 hover:scale-105 transition-transform">
-                                Zapisz w dzienniku
-                            </button>
-                            <button onclick="resetScanner()" class="w-14 flex items-center justify-center bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl font-bold hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">
-                                <i class="ph-bold ph-trash text-lg"></i>
-                            </button>
-                        </div>
+                        <button onclick="confirmAddMeal()" class="w-full bg-brand-500 text-white rounded-xl py-3 font-bold">Zapisz w dzienniku</button>
                     </div>
                 </div>
             </section>
 
-            <!-- ================= EKRAN 4: GENERATOR PRZEPISÓW ================= -->
+            <!-- VIEW: CHEF -->
             <section id="view-recipes" class="screen-fade hidden-screen p-6 md:p-10">
-                <header class="pt-2 mb-8">
-                    <h2 class="text-3xl font-extrabold tracking-tight">Szef Kuchni AI</h2>
-                    <p class="text-sm font-medium text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">Przepis wygenerowany specjalnie po to, by idealnie wpasować się w Twoje pozostałe makro na dziś.</p>
-                </header>
-
-                <!-- Info o pozostałym makro -->
-                <div class="glass-card rounded-[2rem] p-5 mb-8 border border-brand-200 dark:border-brand-900/50 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative overflow-hidden">
-                    <div class="absolute -right-10 -top-10 text-brand-500/10 dark:text-brand-400/5">
-                        <i class="ph-fill ph-target text-9xl"></i>
-                    </div>
-                    <div class="relative z-10">
-                        <p class="text-[10px] text-brand-600 dark:text-brand-400 font-extrabold uppercase tracking-widest mb-1">Twój cel na ten posiłek:</p>
-                        <p class="text-2xl font-black text-slate-800 dark:text-white"><span id="rec-target-cal">0</span> <span class="text-base text-slate-500 font-semibold">kcal</span></p>
-                    </div>
-                    <div class="flex gap-4 relative z-10">
-                        <div class="text-center"><p class="text-[10px] font-bold text-indigo-400 uppercase">Białko</p><p class="font-black text-slate-700 dark:text-slate-200"><span id="rec-target-prot">0</span>g</p></div>
-                        <div class="text-center"><p class="text-[10px] font-bold text-amber-500 uppercase">Węgle</p><p class="font-black text-slate-700 dark:text-slate-200"><span id="rec-target-carb">0</span>g</p></div>
-                        <div class="text-center"><p class="text-[10px] font-bold text-rose-400 uppercase">Tłuszcze</p><p class="font-black text-slate-700 dark:text-slate-200"><span id="rec-target-fat">0</span>g</p></div>
+                <header class="pt-2 mb-8"><h2 class="text-3xl font-extrabold tracking-tight">Szef Kuchni AI</h2></header>
+                <div class="glass-card rounded-[2rem] p-5 mb-8 text-center">
+                    <p class="text-xs text-brand-500 font-bold uppercase mb-1">Pozostałe Makro</p>
+                    <p class="font-black text-xl text-slate-900 dark:text-white mb-2"><span id="rec-target-cal">0</span> kcal</p>
+                    <div class="flex justify-center gap-4 text-sm font-bold text-slate-600 dark:text-slate-300">
+                        <span>B: <span id="rec-target-prot">0</span>g</span><span>W: <span id="rec-target-carb">0</span>g</span><span>T: <span id="rec-target-fat">0</span>g</span>
                     </div>
                 </div>
-
-                <div class="space-y-5">
-                    <div class="glass-card p-2 rounded-3xl">
-                        <textarea id="recipe-ingredients" rows="3" placeholder="Wymień składniki, które masz w lodówce lub określ budżet (np. danie za 15 zł)..." class="w-full bg-transparent border-none rounded-2xl p-4 outline-none text-sm font-medium text-slate-700 dark:text-slate-200 placeholder-slate-400 resize-none"></textarea>
-                    </div>
-
-                    <button id="btn-generate-recipe" onclick="generateRecipe()" class="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl py-4 font-extrabold shadow-xl hover:scale-[1.02] transition-transform flex items-center justify-center gap-3 text-lg">
-                        <i class="ph-fill ph-cooking-pot text-xl text-brand-400 dark:text-brand-500"></i>
-                        <span>Twórz Przepis</span>
-                    </button>
-
-                    <!-- Loading State -->
-                    <div id="recipe-loading" class="hidden flex-col items-center justify-center py-10 glass-card rounded-3xl border border-indigo-200 dark:border-indigo-900/50">
-                         <div class="relative w-16 h-16 flex items-center justify-center mb-4">
-                            <div class="absolute inset-0 rounded-full border-t-2 border-indigo-500 animate-spin"></div>
-                            <i class="ph-fill ph-fire text-2xl text-amber-500 animate-pulse"></i>
-                        </div>
-                        <p class="text-indigo-600 dark:text-indigo-400 font-bold animate-pulse tracking-wide">Gotuję cyfrowe danie...</p>
-                    </div>
-
-                    <!-- Wynik Przepisu -->
-                    <div id="recipe-result" class="hidden glass-card border border-slate-200 dark:border-slate-700 rounded-[2rem] p-6 shadow-xl mt-4">
-                        <h3 id="gen-rec-name" class="font-black text-2xl mb-4 text-slate-900 dark:text-white capitalize">Nazwa</h3>
-                        
-                        <div class="flex flex-wrap gap-2 text-xs font-bold text-slate-600 dark:text-slate-300 mb-6 pb-6 border-b border-slate-200 dark:border-slate-700">
-                            <span class="bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 px-3 py-1.5 rounded-lg flex items-center gap-1"><i class="ph-fill ph-fire"></i> <span id="gen-rec-cal">0</span> kcal</span>
-                            <span class="bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-400 px-3 py-1.5 rounded-lg">B: <span id="gen-rec-prot">0</span>g</span>
-                            <span class="bg-slate-100 dark:bg-slate-700 px-3 py-1.5 rounded-lg">W: <span id="gen-rec-carb">0</span>g</span>
-                            <span class="bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-400 px-3 py-1.5 rounded-lg">T: <span id="gen-rec-fat">0</span>g</span>
-                        </div>
-
-                        <h4 class="font-extrabold text-sm text-slate-900 dark:text-white mb-3 uppercase tracking-wider flex items-center gap-2">
-                            <i class="ph-fill ph-shopping-basket text-brand-500"></i> Składniki
-                        </h4>
-                        <ul id="gen-rec-ingredients" class="list-none text-sm text-slate-600 dark:text-slate-400 mb-8 space-y-2 font-medium">
-                            <!-- li injectowane przez JS -->
-                        </ul>
-
-                        <h4 class="font-extrabold text-sm text-slate-900 dark:text-white mb-3 uppercase tracking-wider flex items-center gap-2">
-                            <i class="ph-fill ph-chef-hat text-brand-500"></i> Instrukcja
-                        </h4>
-                        <ol id="gen-rec-instructions" class="list-decimal pl-4 text-sm text-slate-600 dark:text-slate-400 space-y-3 font-medium marker:text-brand-500 marker:font-bold">
-                            <!-- li injectowane przez JS -->
-                        </ol>
-                        
-                        <button onclick="closeRecipe()" class="w-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl py-3.5 font-bold mt-8 hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">
-                            Zakończ Gotowanie
-                        </button>
-                    </div>
+                <textarea id="recipe-ingredients" rows="3" placeholder="Co masz w lodówce? (np. kurczak, ryż, brokuł)" class="w-full glass-card border border-slate-200 dark:border-slate-700/50 rounded-2xl p-4 outline-none text-sm font-medium mb-4 text-slate-900 dark:text-white bg-transparent"></textarea>
+                <button id="btn-generate-recipe" onclick="generateRecipe()" class="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl py-4 font-extrabold flex items-center justify-center gap-2"><i class="ph-fill ph-cooking-pot text-brand-400"></i> Stwórz Przepis</button>
+                
+                <div id="recipe-loading" class="hidden flex-col items-center py-10"><i class="ph-fill ph-fire text-4xl text-amber-500 animate-pulse mb-3"></i><p class="font-bold text-amber-500">Gotowanie...</p></div>
+                
+                <div id="recipe-result" class="hidden glass-card rounded-[2rem] p-6 mt-4 text-slate-900 dark:text-white">
+                    <h3 id="gen-rec-name" class="font-black text-xl mb-4">Nazwa</h3>
+                    <ul id="gen-rec-ingredients" class="list-disc pl-5 text-sm mb-4 text-slate-600 dark:text-slate-300"></ul>
+                    <p id="gen-rec-instructions" class="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-line"></p>
                 </div>
             </section>
 
-            <!-- ================= EKRAN 5: USTAWIENIA ================= -->
+            <!-- VIEW: SETTINGS -->
             <section id="view-settings" class="screen-fade hidden-screen p-6 md:p-10">
-                <header class="pt-2 mb-8">
-                    <h2 class="text-3xl font-extrabold tracking-tight">Ustawienia</h2>
-                    <p class="text-sm font-medium text-slate-500 dark:text-slate-400 mt-2">Dostosuj aplikację do swoich potrzeb.</p>
-                </header>
-
-                <div class="space-y-6">
-                    <!-- Wygląd -->
-                    <div class="glass-card rounded-[2rem] p-6 shadow-sm">
-                        <h3 class="font-extrabold text-lg mb-4 text-slate-800 dark:text-white">Wygląd</h3>
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400">
-                                    <i class="ph-fill ph-moon text-xl"></i>
-                                </div>
-                                <div>
-                                    <p class="font-bold text-slate-700 dark:text-slate-200">Tryb Ciemny</p>
-                                    <p class="text-xs text-slate-400">Przyjazny dla oczu w nocy</p>
-                                </div>
-                            </div>
-                            <!-- Toggle Switch -->
-                            <button onclick="toggleDarkMode()" class="w-14 h-7 rounded-full bg-slate-300 dark:bg-brand-500 relative transition-colors duration-300 focus:outline-none">
-                                <div id="theme-knob" class="w-5 h-5 bg-white rounded-full absolute top-1 left-1 transition-transform duration-300 transform dark:translate-x-7 shadow-md"></div>
-                            </button>
-                        </div>
+                <header class="pt-2 mb-8"><h2 class="text-3xl font-extrabold tracking-tight">Ustawienia</h2></header>
+                <div class="glass-card rounded-[2rem] p-6 mb-6">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-slate-800 dark:text-white">Tryb Ciemny</span>
+                        <button onclick="toggleDarkMode()" class="w-14 h-7 rounded-full bg-brand-500 relative transition-colors focus:outline-none"><div id="theme-knob" class="w-5 h-5 bg-white rounded-full absolute top-1 left-1 dark:translate-x-7 transition-transform"></div></button>
                     </div>
-
-                    <!-- API Key -->
-                    <div class="glass-card rounded-[2rem] p-6 shadow-sm">
-                        <h3 class="font-extrabold text-lg mb-4 text-slate-800 dark:text-white flex items-center gap-2">
-                            Silnik AI <i class="ph-fill ph-lock-key text-brand-500"></i>
-                        </h3>
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 ml-1">Klucz Gemini API</label>
-                                <input type="password" id="api-key-input" placeholder="Wklej klucz (AI Studio)..." class="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3.5 outline-none focus:ring-2 focus:ring-brand-500 transition-all text-sm font-medium">
-                            </div>
-                            <p class="text-xs text-slate-400 dark:text-slate-500 font-medium leading-relaxed">
-                                Aplikacja działa wyłącznie w Twojej przeglądarce. Klucz jest szyfrowany i zapisywany lokalnie (localStorage). Nikt inny nie ma do niego dostępu. Zawsze używany jest model <span class="font-bold text-slate-600 dark:text-slate-300">gemini-1.5-flash</span>.
-                            </p>
-                            <button onclick="saveApiKey()" class="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl py-3.5 font-bold shadow-lg hover:scale-[1.02] transition-transform">
-                                Zapisz Bezpiecznie
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="text-center pt-4">
-                        <button onclick="navTo('setup')" class="text-sm font-bold text-slate-500 hover:text-brand-500 transition-colors flex items-center justify-center gap-2 mx-auto">
-                            <i class="ph-bold ph-pencil-simple"></i> Zmień parametry fizyczne
-                        </button>
-                    </div>
+                </div>
+                <div class="glass-card rounded-[2rem] p-6">
+                    <h3 class="font-extrabold text-lg mb-4 text-slate-800 dark:text-white">Klucz Gemini API</h3>
+                    <input type="password" id="api-key-input" placeholder="Klucz API..." class="w-full glass-card border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 outline-none text-slate-900 dark:text-white bg-transparent mb-4">
+                    <button onclick="saveApiKey()" class="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl py-3 font-bold">Zapisz Klucz</button>
                 </div>
             </section>
         </div>
     </main>
 
-    <!-- ================= BOTTOM NAVIGATION (MOBILE) ================= -->
-    <nav id="bottom-nav" class="md:hidden fixed bottom-0 w-full z-40 pb-[env(safe-area-inset-bottom)] transition-transform duration-500 transform translate-y-full">
-        <!-- Floating container -->
-        <div class="mx-4 mb-4 glass-panel rounded-3xl shadow-2xl px-6 py-3 flex justify-between items-center relative overflow-visible border-white/40 dark:border-slate-700/50">
-            <button onclick="navTo('dashboard')" id="nav-btn-dashboard" class="flex flex-col items-center gap-1 w-14 text-brand-600 dark:text-brand-400 transition-all scale-110">
-                <i class="ph-fill ph-house text-[26px]"></i>
-                <span class="text-[9px] font-bold uppercase tracking-wider mt-0.5">Home</span>
+    <!-- MOBILE NAV -->
+    <nav id="bottom-nav" class="md:hidden fixed bottom-0 w-full z-40 pb-[env(safe-area-inset-bottom)] transition-transform duration-500 translate-y-full">
+        <div class="mx-4 mb-4 glass-panel rounded-3xl px-6 py-3 flex justify-between items-center bg-white/80 dark:bg-slate-900/80">
+            <button onclick="navTo('dashboard')" id="nav-btn-dashboard" class="flex flex-col items-center w-14 text-slate-400"><i class="ph ph-house text-2xl"></i><span class="text-[9px] font-bold uppercase mt-1">Home</span></button>
+            <button onclick="navTo('add-meal')" id="nav-btn-add" class="relative -top-6 flex flex-col items-center">
+                <div class="w-14 h-14 bg-gradient-to-tr from-brand-600 to-brand-400 rounded-full flex items-center justify-center text-white border-4 border-slate-50 dark:border-slate-900"><i class="ph-bold ph-plus text-2xl"></i></div>
+                <span class="text-[9px] font-bold uppercase mt-1 text-slate-500">Dodaj</span>
             </button>
-            
-            <button onclick="navTo('add-meal')" id="nav-btn-add" class="relative -top-6 flex flex-col items-center group">
-                <div class="w-14 h-14 bg-gradient-to-tr from-brand-600 to-brand-400 rounded-full flex items-center justify-center shadow-xl shadow-brand-500/40 text-white border-4 border-slate-50 dark:border-slate-900 group-hover:scale-110 transition-transform">
-                    <i class="ph-bold ph-plus text-2xl"></i>
-                </div>
-                <span class="text-[9px] font-bold uppercase tracking-wider mt-1 text-slate-500 dark:text-slate-400" id="nav-text-add">Dodaj</span>
-            </button>
-            
-            <button onclick="navTo('recipes')" id="nav-btn-recipes" class="flex flex-col items-center gap-1 w-14 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-all">
-                <i class="ph ph-magic-wand text-[26px]"></i>
-                <span class="text-[9px] font-bold uppercase tracking-wider mt-0.5">Szef</span>
-            </button>
-            
-            <button onclick="navTo('settings')" id="nav-btn-settings" class="flex flex-col items-center gap-1 w-14 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-all">
-                <i class="ph ph-gear text-[26px]"></i>
-                <span class="text-[9px] font-bold uppercase tracking-wider mt-0.5">Opcje</span>
-            </button>
+            <button onclick="navTo('recipes')" id="nav-btn-recipes" class="flex flex-col items-center w-14 text-slate-400"><i class="ph ph-magic-wand text-2xl"></i><span class="text-[9px] font-bold uppercase mt-1">Szef</span></button>
+            <button onclick="navTo('settings')" id="nav-btn-settings" class="flex flex-col items-center w-14 text-slate-400"><i class="ph ph-gear text-2xl"></i><span class="text-[9px] font-bold uppercase mt-1">Opcje</span></button>
         </div>
     </nav>
 
-    <!-- Ukryty Canvas do optymalizacji zdjęć (base64) -->
     <canvas id="image-canvas" class="hidden"></canvas>
 
     <script>
-        /**
-         * Główny stan aplikacji
-         */
-        const state = {
-            profile: null,
-            today: {
-                date: new Date().toLocaleDateString('pl-PL'),
-                consumedCalories: 0, consumedProtein: 0, consumedCarbs: 0, consumedFat: 0,
-                meals: []
-            },
-            tempMeal: null
-        };
-
+        const state = { profile: null, today: { date: new Date().toLocaleDateString('pl-PL'), consumedCalories: 0, consumedProtein: 0, consumedCarbs: 0, consumedFat: 0, meals: [] }, tempMeal: null };
         let currentBase64Image = null;
 
-        // Inicjalizacja
         window.onload = () => {
-            loadDarkMode();
-            loadState();
-            setFormattedDate();
-            
+            loadDarkMode(); loadState();
             const savedKey = localStorage.getItem('gemini_api_key');
             if (savedKey) document.getElementById('api-key-input').value = savedKey;
             
-            if (!state.profile) {
-                navTo('setup');
-            } else {
-                checkNewDay();
-                updateDashboardUI();
-                navTo('dashboard');
-                document.getElementById('bottom-nav').classList.remove('translate-y-full');
-            }
+            if (!state.profile) navTo('setup');
+            else { checkNewDay(); updateDashboardUI(); navTo('dashboard'); document.getElementById('bottom-nav').classList.remove('translate-y-full'); }
         };
 
-        // Dark Mode Logic
-        function toggleDarkMode() {
-            document.documentElement.classList.toggle('dark');
-            const isDark = document.documentElement.classList.contains('dark');
-            localStorage.setItem('dietAiDarkMode', isDark ? 'dark' : 'light');
-            updateDarkModeUI(isDark);
-        }
+        function toggleDarkMode() { document.documentElement.classList.toggle('dark'); localStorage.setItem('dietAiTheme', document.documentElement.classList.contains('dark') ? 'dark' : 'light'); }
+        function loadDarkMode() { if (localStorage.getItem('dietAiTheme') === 'dark' || (!localStorage.getItem('dietAiTheme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark'); }
 
-        function loadDarkMode() {
-            const saved = localStorage.getItem('dietAiDarkMode');
-            if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                document.documentElement.classList.add('dark');
-                updateDarkModeUI(true);
-            } else {
-                updateDarkModeUI(false);
-            }
-        }
-
-        function updateDarkModeUI(isDark) {
-            // Meta theme color
-            document.getElementById('theme-color-meta').setAttribute('content', isDark ? '#0f172a' : '#f8fafc');
-        }
-
-        /**
-         * Nawigacja i UI
-         */
-        function navTo(viewName) {
-            // Ekran główny (mobile i desktop)
-            document.querySelectorAll('.screen-fade').forEach(el => {
-                el.classList.remove('active-screen');
-                el.classList.add('hidden-screen');
+        function navTo(view) {
+            document.querySelectorAll('.screen-fade').forEach(el => { el.classList.remove('active-screen'); el.classList.add('hidden-screen'); });
+            document.getElementById(`view-${view}`).classList.remove('hidden-screen'); document.getElementById(`view-${view}`).classList.add('active-screen');
+            ['dashboard', 'recipes', 'settings'].forEach(b => {
+                const el = document.getElementById(`nav-btn-${b}`);
+                if(el) { el.classList.toggle('text-brand-500', b === view); el.classList.toggle('text-slate-400', b !== view); }
             });
-            document.getElementById(`view-${viewName}`).classList.remove('hidden-screen');
-            document.getElementById(`view-${viewName}`).classList.add('active-screen');
-
-            // Pokazanie dolnego paska jeśli profil istnieje (ukryte w setup)
-            if (viewName !== 'setup') {
-                document.getElementById('bottom-nav').classList.remove('translate-y-full');
-            } else {
-                document.getElementById('bottom-nav').classList.add('translate-y-full');
-            }
-
-            // Aktualizacja ikonek paska (Mobile)
-            const btns = ['dashboard', 'recipes', 'settings'];
-            btns.forEach(btn => {
-                const el = document.getElementById(`nav-btn-${btn}`);
-                if(el) {
-                    const icon = el.querySelector('i');
-                    if (btn === viewName) {
-                        el.classList.add('text-brand-600', 'dark:text-brand-400', 'scale-110');
-                        el.classList.remove('text-slate-400');
-                        icon.classList.add('ph-fill'); icon.classList.remove('ph');
-                    } else {
-                        el.classList.remove('text-brand-600', 'dark:text-brand-400', 'scale-110');
-                        el.classList.add('text-slate-400');
-                        icon.classList.remove('ph-fill'); icon.classList.add('ph');
-                    }
-                }
-            });
-
-            // Aktualizacja Sidebar (Desktop)
-            const sideBtns = ['dashboard', 'add', 'recipes', 'settings'];
-            sideBtns.forEach(btn => {
-                const sideEl = document.getElementById(`side-nav-${btn}`);
-                if(sideEl) {
-                    const icon = sideEl.querySelector('i');
-                    if (btn === viewName || (btn === 'add' && viewName === 'add-meal')) {
-                        sideEl.classList.add('bg-brand-50', 'dark:bg-brand-500/10', 'text-brand-600', 'dark:text-brand-400');
-                        sideEl.classList.remove('text-slate-500', 'dark:text-slate-400');
-                        icon.classList.add('ph-fill'); icon.classList.remove('ph');
-                    } else {
-                        sideEl.classList.remove('bg-brand-50', 'dark:bg-brand-500/10', 'text-brand-600', 'dark:text-brand-400');
-                        sideEl.classList.add('text-slate-500', 'dark:text-slate-400');
-                        icon.classList.remove('ph-fill'); icon.classList.add('ph');
-                    }
-                }
-            });
-
-            if (viewName === 'recipes') updateRecipeTargetUI();
-            
-            // Scroll to top
-            document.getElementById('main-container').scrollTo({top: 0, behavior: 'smooth'});
+            if (view === 'recipes') updateRecipeUI();
+            document.getElementById('main-container').scrollTo(0,0);
         }
 
         function showToast(msg) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toast-msg').innerText = msg;
-            toast.classList.remove('opacity-0', 'pointer-events-none', '-translate-y-4');
-            toast.classList.add('opacity-100', 'translate-y-0');
-            setTimeout(() => {
-                toast.classList.add('opacity-0', 'pointer-events-none', '-translate-y-4');
-                toast.classList.remove('opacity-100', 'translate-y-0');
-            }, 3000);
+            const t = document.getElementById('toast'); document.getElementById('toast-msg').innerText = msg;
+            t.classList.remove('opacity-0', 'pointer-events-none'); setTimeout(() => t.classList.add('opacity-0', 'pointer-events-none'), 3000);
         }
 
-        function setFormattedDate() {
-            const options = { weekday: 'long', day: 'numeric', month: 'long' };
-            document.getElementById('current-date').innerText = new Date().toLocaleDateString('pl-PL', options);
-        }
-
-        /**
-         * Konfiguracja
-         */
-        document.getElementById('setup-form').addEventListener('submit', (e) => {
+        document.getElementById('setup-form').onsubmit = (e) => {
             e.preventDefault();
-            const w = parseFloat(document.getElementById('s-weight').value);
-            const h = parseFloat(document.getElementById('s-height').value);
-            const a = parseInt(document.getElementById('s-age').value);
-            const g = document.getElementById('s-gender').value;
-            const act = parseFloat(document.getElementById('s-activity').value);
-            const goal = parseInt(document.getElementById('s-goal').value);
+            const w = +document.getElementById('s-weight').value, h = +document.getElementById('s-height').value, a = +document.getElementById('s-age').value, act = +document.getElementById('s-activity').value, g = +document.getElementById('s-goal').value;
+            const tdee = Math.round(((10 * w) + (6.25 * h) - (5 * a) + (document.getElementById('s-gender').value === 'male' ? 5 : -161)) * act) + g;
+            state.profile = { targetCalories: tdee, targetProtein: Math.round(w * 2.2), targetFat: Math.round(w * 1.0), targetCarbs: Math.max(0, Math.round((tdee - (w*2.2*4) - (w*1.0*9)) / 4)) };
+            saveState(); updateDashboardUI(); document.getElementById('bottom-nav').classList.remove('translate-y-full'); navTo('dashboard');
+        };
 
-            let bmr = (10 * w) + (6.25 * h) - (5 * a) + (g === 'male' ? 5 : -161);
-            const tdee = Math.round(bmr * act) + goal;
-
-            const tP = Math.round(w * 2.2);
-            const tF = Math.round(w * 1.0);
-            const tC = Math.max(0, Math.round((tdee - (tP * 4) - (tF * 9)) / 4));
-
-            state.profile = { targetCalories: tdee, targetProtein: tP, targetCarbs: tC, targetFat: tF };
-            saveState();
-            showToast("Plan zaktualizowany!");
-            updateDashboardUI();
-            navTo('dashboard');
-        });
-
-        /**
-         * Dashboard
-         */
         function updateDashboardUI() {
-            if (!state.profile) return;
+            if(!state.profile) return;
             const p = state.profile, t = state.today;
-            const cRem = Math.max(0, p.targetCalories - t.consumedCalories);
-
-            document.getElementById('cal-remaining').innerText = cRem;
-            document.getElementById('cal-consumed').innerText = t.consumedCalories;
-            document.getElementById('cal-target').innerText = p.targetCalories;
-
-            const perc = Math.min(100, (t.consumedCalories / p.targetCalories) * 100);
-            const ring = document.getElementById('cal-progress-ring');
-            ring.setAttribute('stroke-dasharray', `${perc}, 100`);
+            document.getElementById('cal-remaining').innerText = Math.max(0, p.targetCalories - t.consumedCalories);
+            document.getElementById('cal-progress-ring').setAttribute('stroke-dasharray', `${Math.min(100, (t.consumedCalories / p.targetCalories) * 100)}, 100`);
+            document.getElementById('prot-text').innerText = `${t.consumedProtein}/${p.targetProtein}g`; document.getElementById('bar-prot').style.width = `${Math.min(100, (t.consumedProtein/p.targetProtein)*100)}%`;
+            document.getElementById('carb-text').innerText = `${t.consumedCarbs}/${p.targetCarbs}g`; document.getElementById('bar-carb').style.width = `${Math.min(100, (t.consumedCarbs/p.targetCarbs)*100)}%`;
+            document.getElementById('fat-text').innerText = `${t.consumedFat}/${p.targetFat}g`; document.getElementById('bar-fat').style.width = `${Math.min(100, (t.consumedFat/p.targetFat)*100)}%`;
             
-            // Kolorowanie paska przy przekroczeniu
-            if(perc >= 100 && cRem === 0) {
-                ring.classList.replace('stroke-brand-500', 'stroke-green-500');
-                ring.classList.replace('dark:stroke-brand-400', 'dark:stroke-green-400');
-            } else if (t.consumedCalories > p.targetCalories) {
-                ring.classList.replace('stroke-brand-500', 'stroke-rose-500');
-                ring.classList.replace('stroke-green-500', 'stroke-rose-500');
-                ring.classList.replace('dark:stroke-brand-400', 'dark:stroke-rose-500');
-                ring.classList.replace('dark:stroke-green-400', 'dark:stroke-rose-500');
-            }
-
-            // Macros text
-            document.getElementById('prot-consumed').innerText = t.consumedProtein; document.getElementById('prot-target').innerText = p.targetProtein; document.getElementById('prot-left').innerText = `${Math.max(0, p.targetProtein - t.consumedProtein)}g left`;
-            document.getElementById('carb-consumed').innerText = t.consumedCarbs; document.getElementById('carb-target').innerText = p.targetCarbs; document.getElementById('carb-left').innerText = `${Math.max(0, p.targetCarbs - t.consumedCarbs)}g left`;
-            document.getElementById('fat-consumed').innerText = t.consumedFat; document.getElementById('fat-target').innerText = p.targetFat; document.getElementById('fat-left').innerText = `${Math.max(0, p.targetFat - t.consumedFat)}g left`;
-
-            // Macro bars
-            document.getElementById('bar-prot').style.width = `${Math.min(100, (t.consumedProtein/p.targetProtein)*100)}%`;
-            document.getElementById('bar-carb').style.width = `${Math.min(100, (t.consumedCarbs/p.targetCarbs)*100)}%`;
-            document.getElementById('bar-fat').style.width = `${Math.min(100, (t.consumedFat/p.targetFat)*100)}%`;
-
-            // List
-            const list = document.getElementById('meals-list'), empty = document.getElementById('empty-meals-msg');
-            Array.from(list.children).forEach(c => { if(c.id !== 'empty-meals-msg') c.remove(); });
-            
-            if (t.meals.length === 0) empty.classList.remove('hidden');
-            else {
-                empty.classList.add('hidden');
-                [...t.meals].reverse().forEach(m => {
-                    const d = document.createElement('div');
-                    d.className = "glass-card p-4 rounded-[1.5rem] flex items-center justify-between border-l-4 border-l-brand-500";
-                    d.innerHTML = `
-                        <div>
-                            <p class="font-extrabold text-slate-800 dark:text-slate-100 capitalize text-sm mb-1">${m.name}</p>
-                            <p class="text-xs font-bold text-slate-400 dark:text-slate-500 flex gap-2">
-                                <span><i class="ph-fill ph-clock"></i> ${m.time}</span>
-                                <span>B:${m.p} W:${m.c} T:${m.f}</span>
-                            </p>
-                        </div>
-                        <div class="font-black text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-500/10 px-4 py-2 rounded-xl">
-                            ${m.cals} kcal
-                        </div>
-                    `;
-                    list.appendChild(d);
-                });
-            }
+            const list = document.getElementById('meals-list'); list.innerHTML = '';
+            t.meals.forEach(m => list.innerHTML = `<div class="glass-card p-4 rounded-xl flex justify-between mb-3 border-l-4 border-brand-500"><div><p class="font-bold">${m.name}</p><p class="text-xs text-slate-500">B:${m.p} W:${m.c} T:${m.f}</p></div><div class="font-black text-brand-500">${m.cals} kcal</div></div>` + list.innerHTML);
         }
 
-        function resetDaily() {
-            state.today = { date: new Date().toLocaleDateString('pl-PL'), consumedCalories: 0, consumedProtein: 0, consumedCarbs: 0, consumedFat: 0, meals: [] };
-            saveState(); updateDashboardUI(); showToast("Nowy dzień rozpoczęty!");
-        }
+        function resetDaily() { state.today = { date: new Date().toLocaleDateString('pl-PL'), consumedCalories: 0, consumedProtein: 0, consumedCarbs: 0, consumedFat: 0, meals: [] }; saveState(); updateDashboardUI(); showToast("Nowy dzień!"); }
+        function checkNewDay() { if (state.today.date !== new Date().toLocaleDateString('pl-PL')) resetDaily(); }
+        function saveApiKey() { localStorage.setItem('gemini_api_key', document.getElementById('api-key-input').value.trim()); showToast("Klucz zapisany!"); }
 
-        function checkNewDay() {
-            if (state.today.date !== new Date().toLocaleDateString('pl-PL')) resetDaily();
-        }
-
-        function saveApiKey() {
-            const key = document.getElementById('api-key-input').value.trim();
-            if (key) { localStorage.setItem('gemini_api_key', key); showToast("Klucz API bezpiecznie zapisany!"); }
-            else showToast("Wprowadź prawidłowy klucz.");
-        }
-
-        /**
-         * Skaner (Aparat/Galeria)
-         */
-        function handleImageSelect(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
+        function handleImageSelect(e) {
+            const file = e.target.files[0]; if(!file) return;
+            const r = new FileReader();
+            r.onload = e => {
                 const img = new Image();
-                img.onload = function() {
-                    const canvas = document.getElementById('image-canvas');
-                    const MAX_WIDTH = 800;
-                    const scale = MAX_WIDTH / img.width;
-                    canvas.width = MAX_WIDTH; canvas.height = img.height * scale;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    
-                    currentBase64Image = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
-                    
+                img.onload = () => {
+                    const c = document.getElementById('image-canvas'), scale = 600 / img.width;
+                    c.width = 600; c.height = img.height * scale;
+                    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+                    currentBase64Image = c.toDataURL('image/jpeg', 0.7).split(',')[1];
                     document.getElementById('image-preview').src = e.target.result;
-                    document.getElementById('image-action-buttons').classList.add('hidden');
-                    document.getElementById('image-preview-container').classList.remove('hidden');
-                }
-                img.src = e.target.result;
-            }
-            reader.readAsDataURL(file);
+                    document.getElementById('image-action-buttons').classList.add('hidden'); document.getElementById('image-preview-container').classList.remove('hidden');
+                }; img.src = e.target.result;
+            }; r.readAsDataURL(file);
         }
 
-        function resetImageSelection() {
-            currentBase64Image = null;
-            document.getElementById('meal-camera').value = '';
-            document.getElementById('meal-gallery').value = '';
-            document.getElementById('image-preview-container').classList.add('hidden');
-            document.getElementById('image-action-buttons').classList.remove('hidden');
-        }
+        function resetScanner() { currentBase64Image = null; document.getElementById('meal-desc').value = ''; document.getElementById('image-preview-container').classList.add('hidden'); document.getElementById('image-action-buttons').classList.remove('hidden'); document.getElementById('ai-result').classList.add('hidden'); document.getElementById('btn-analyze').classList.remove('hidden'); }
 
         async function analyzeMeal() {
             const desc = document.getElementById('meal-desc').value.trim();
-            if (!currentBase64Image && !desc) { showToast("Wybierz zdjęcie lub opisz posiłek."); return; }
-            const key = localStorage.getItem('gemini_api_key');
-            if (!key) { showToast("Brak klucza API. Przejdź do Ustawień."); navTo('settings'); return; }
+            if (!currentBase64Image && !desc) { showToast("Podaj zdjęcie lub tekst."); return; }
+            const key = localStorage.getItem('gemini_api_key'); if (!key) { showToast("Brak klucza API."); navTo('settings'); return; }
 
-            document.getElementById('btn-analyze').classList.add('hidden');
-            document.getElementById('ai-loading').classList.remove('hidden');
-            document.getElementById('ai-loading').classList.add('flex');
-            document.getElementById('ai-result').classList.add('hidden');
+            document.getElementById('btn-analyze').classList.add('hidden'); document.getElementById('ai-loading').classList.remove('hidden'); document.getElementById('ai-loading').classList.add('flex');
+            
+            const parts = [{ text: `Przeanalizuj kalorie posiłku z obrazu lub opisu: "${desc}". Zwróć kod JSON. Schemat: {"mealName": "nazwa", "calories": 0, "protein": 0, "carbs": 0, "fat": 0, "evaluation": "ocena"}` }];
+            if (currentBase64Image) parts.push({ inlineData: { mimeType: "image/jpeg", data: currentBase64Image } });
 
-            // 1. Bezpieczna konstrukcja części tekstowej (w tym ścisły prompt z zerami)
-            const parts = [
-                { text: `Jesteś dietetykiem. Przeanalizuj to zdjęcie i/lub opis: "${desc || 'brak opisu'}". Zwróć WYŁĄCZNIE dane w formacie JSON. Użyj dokładnie tego schematu (wypełnij liczbami całkowitymi): {"mealName": "nazwa", "calories": 0, "protein": 0, "carbs": 0, "fat": 0, "evaluation": "krótka ocena"}` }
-            ];
-
-            // 2. Dodajemy część obrazkową TYLKO wtedy, gdy mamy przetworzone zdjęcie
-            if (currentBase64Image) {
-                parts.push({
-                    inlineData: {
-                        mimeType: "image/jpeg",
-                        data: currentBase64Image
-                    }
-                });
-            }
-
-            const payload = {
-                contents: [{
-                    role: "user",
-                    parts: parts
-                }],
-                generationConfig: {
-                    responseMimeType: "application/json"
-                }
-            };
-
+            // CRITICAL FIX: Zawsze używamy endpointu v1beta, aby uniknąć błędów nieznalezienia modelu.
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
+            
             try {
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
-                    method: 'POST', 
-                    headers: { 'Content-Type': 'application/json' }, 
-                    body: JSON.stringify(payload)
-                });
-                
+                const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ role: "user", parts }], generationConfig: { responseMimeType: "application/json" } }) });
                 const result = await res.json();
+                if (!res.ok) throw new Error(result.error?.message || "Błąd API Google");
                 
-                if (!res.ok) {
-                    const errMsg = result.error?.message || "Nieznany błąd API";
-                    throw new Error(errMsg);
-                }
-
                 let jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-                
-                if (jsonText) {
-                    // 3. Kuloodporne czyszczenie JSON-a na wypadek "odklejki" modelu
-                    jsonText = jsonText.replace(/```json/gi, '').replace(/```/g, '').trim();
-                    const jsonStart = jsonText.indexOf('{');
-                    const jsonEnd = jsonText.lastIndexOf('}') + 1;
-                    if (jsonStart !== -1 && jsonEnd !== 0) {
-                        jsonText = jsonText.substring(jsonStart, jsonEnd);
-                    }
+                if(jsonText) {
+                    // Bezpieczne wydobycie JSONa przez regex
+                    const match = jsonText.match(/\{[\s\S]*\}/);
+                    if(!match) throw new Error("API nie zwróciło JSON");
+                    const d = JSON.parse(match[0]);
                     
-                    const d = JSON.parse(jsonText);
-                    
-                    state.tempMeal = { 
-                        name: d.mealName || "Nieznany posiłek", 
-                        cals: Math.round(d.calories || 0), 
-                        p: Math.round(d.protein || 0), 
-                        c: Math.round(d.carbs || 0), 
-                        f: Math.round(d.fat || 0), 
-                        eval: d.evaluation || "Brak oceny", 
-                        time: new Date().toLocaleTimeString('pl-PL', {hour:'2-digit', minute:'2-digit'}) 
-                    };
-                    
-                    document.getElementById('res-name').innerText = state.tempMeal.name; 
-                    document.getElementById('res-eval').innerText = state.tempMeal.eval;
-                    document.getElementById('res-cal').innerText = state.tempMeal.cals; 
-                    document.getElementById('res-prot').innerText = state.tempMeal.p + 'g';
-                    document.getElementById('res-carb').innerText = state.tempMeal.c + 'g'; 
-                    document.getElementById('res-fat').innerText = state.tempMeal.f + 'g';
-                    
+                    state.tempMeal = { name: d.mealName || "Posiłek", cals: Math.round(d.calories||0), p: Math.round(d.protein||0), c: Math.round(d.carbs||0), f: Math.round(d.fat||0) };
+                    document.getElementById('res-name').innerText = state.tempMeal.name; document.getElementById('res-eval').innerText = d.evaluation || "";
+                    document.getElementById('res-cal').innerText = state.tempMeal.cals; document.getElementById('res-prot').innerText = state.tempMeal.p+'g'; document.getElementById('res-carb').innerText = state.tempMeal.c+'g'; document.getElementById('res-fat').innerText = state.tempMeal.f+'g';
                     document.getElementById('ai-result').classList.remove('hidden');
-                } else {
-                    throw new Error("Pusta odpowiedź z modelu (Safety block).");
-                }
-            } catch (e) {
-                console.error("Szczegóły błędu:", e);
-                let errorMsg = e.message || String(e);
-                // Obcinamy powiadomienie, żeby idealnie mieściło się w "toascie" na iPhonie
-                if (errorMsg.length > 55) errorMsg = errorMsg.substring(0, 55) + "...";
-                showToast("Błąd: " + errorMsg); 
-                document.getElementById('btn-analyze').classList.remove('hidden');
-            } finally {
-                document.getElementById('ai-loading').classList.add('hidden'); 
-                document.getElementById('ai-loading').classList.remove('flex');
-            }
+                } else throw new Error("Pusta odpowiedź z modelu");
+            } catch (e) { showToast("Błąd: " + (e.message).substring(0,60)); document.getElementById('btn-analyze').classList.remove('hidden'); } 
+            finally { document.getElementById('ai-loading').classList.add('hidden'); document.getElementById('ai-loading').classList.remove('flex'); }
         }
 
         function confirmAddMeal() {
-            if(!state.tempMeal) return;
-            const m = state.tempMeal, t = state.today;
+            if(!state.tempMeal) return; const m = state.tempMeal, t = state.today;
             t.consumedCalories += m.cals; t.consumedProtein += m.p; t.consumedCarbs += m.c; t.consumedFat += m.f; t.meals.push(m);
-            saveState(); updateDashboardUI(); showToast("Sukces! Dodano do dziennika."); resetScanner(); navTo('dashboard');
+            saveState(); updateDashboardUI(); resetScanner(); showToast("Dodano do dziennika."); navTo('dashboard');
         }
 
-        function resetScanner() {
-            resetImageSelection();
-            state.tempMeal = null;
-            document.getElementById('meal-desc').value = '';
-            document.getElementById('ai-result').classList.add('hidden');
-            document.getElementById('btn-analyze').classList.remove('hidden');
-        }
-
-        /**
-         * Generator Przepisów
-         */
-        function updateRecipeTargetUI() {
-            if(!state.profile) return;
-            const p = state.profile, t = state.today;
+        function updateRecipeUI() {
+            if(!state.profile) return; const p = state.profile, t = state.today;
             document.getElementById('rec-target-cal').innerText = Math.max(0, p.targetCalories - t.consumedCalories);
             document.getElementById('rec-target-prot').innerText = Math.max(0, p.targetProtein - t.consumedProtein);
             document.getElementById('rec-target-carb').innerText = Math.max(0, p.targetCarbs - t.consumedCarbs);
@@ -976,77 +365,39 @@
         }
 
         async function generateRecipe() {
-            const input = document.getElementById('recipe-ingredients').value.trim();
-            if(!input) { showToast("Dodaj listę składników lub budżet."); return; }
-            const key = localStorage.getItem('gemini_api_key');
-            if (!key) { navTo('settings'); showToast("Podaj klucz API w ustawieniach."); return; }
-
-            document.getElementById('btn-generate-recipe').classList.add('hidden');
-            document.getElementById('recipe-loading').classList.remove('hidden');
-            document.getElementById('recipe-loading').classList.add('flex');
-            document.getElementById('recipe-result').classList.add('hidden');
-
+            const input = document.getElementById('recipe-ingredients').value; if(!input) return showToast("Dodaj listę składników.");
+            const key = localStorage.getItem('gemini_api_key'); if (!key) return showToast("Brak klucza API.");
+            
+            document.getElementById('btn-generate-recipe').classList.add('hidden'); document.getElementById('recipe-loading').classList.remove('hidden'); document.getElementById('recipe-loading').classList.add('flex');
+            
             const p = state.profile, t = state.today;
-            const payload = {
-                contents: [{ role: "user", parts: [{ text: `Składniki/Budżet: "${input}". Stwórz przepis trafiający w te makro (lub blisko): Kcal: ${Math.max(100, p.targetCalories - t.consumedCalories)}, Białko: ${Math.max(10, p.targetProtein - t.consumedProtein)}g, Węgle: ${Math.max(10, p.targetCarbs - t.consumedCarbs)}g, Tłuszcze: ${Math.max(5, p.targetFat - t.consumedFat)}g. Zwróć WYŁĄCZNIE czysty JSON bez markdown w formacie: {"recipeName": "nazwa", "ingredients": ["składnik 1"], "instructions": ["krok 1"], "calories": 0, "protein": 0, "carbs": 0, "fat": 0}` }] }],
-                generationConfig: {
-                    responseMimeType: "application/json"
-                }
-            };
-
+            const prompt = `Składniki: "${input}". Przepis dla makro: Kcal: ${Math.max(100, p.targetCalories - t.consumedCalories)}, B: ${Math.max(10, p.targetProtein - t.consumedProtein)}g, W: ${Math.max(10, p.targetCarbs - t.consumedCarbs)}g, T: ${Math.max(5, p.targetFat - t.consumedFat)}g. Zwróć JSON: {"recipeName": "nazwa", "ingredients": ["składnik 1"], "instructions": "krok 1\\nkrok 2"}`;
+            
+            // Wymuszony endpoint v1beta z gemini-1.5-flash
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
+            
             try {
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
-                });
+                const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ role: "user", parts: [{text: prompt}] }], generationConfig: { responseMimeType: "application/json" } }) });
                 const result = await res.json();
-                
                 if (!res.ok) throw new Error(result.error?.message || "Błąd API Google");
                 
                 let jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-                
                 if(jsonText) {
-                    // Bulletproof JSON parsing
-                    jsonText = jsonText.replace(/```json/gi, '').replace(/```/g, '').trim();
-                    const jsonStart = jsonText.indexOf('{');
-                    const jsonEnd = jsonText.lastIndexOf('}') + 1;
-                    if (jsonStart !== -1 && jsonEnd !== 0) {
-                        jsonText = jsonText.substring(jsonStart, jsonEnd);
-                    }
+                    const match = jsonText.match(/\{[\s\S]*\}/);
+                    if(!match) throw new Error("API nie zwróciło JSON");
+                    const d = JSON.parse(match[0]);
                     
-                    const d = JSON.parse(jsonText);
-                    document.getElementById('gen-rec-name').innerText = d.recipeName || "Przepis AI"; 
-                    document.getElementById('gen-rec-cal').innerText = Math.round(d.calories || 0);
-                    document.getElementById('gen-rec-prot').innerText = Math.round(d.protein || 0); 
-                    document.getElementById('gen-rec-carb').innerText = Math.round(d.carbs || 0);
-                    document.getElementById('gen-rec-fat').innerText = Math.round(d.fat || 0);
-                    
-                    const iList = document.getElementById('gen-rec-ingredients'); iList.innerHTML = '';
-                    (d.ingredients || []).forEach(i => iList.innerHTML += `<li class="flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-brand-500"></div>${i}</li>`);
-                    
-                    const pList = document.getElementById('gen-rec-instructions'); pList.innerHTML = '';
-                    (d.instructions || []).forEach(i => pList.innerHTML += `<li>${i}</li>`);
-                    
+                    document.getElementById('gen-rec-name').innerText = d.recipeName;
+                    document.getElementById('gen-rec-ingredients').innerHTML = d.ingredients.map(i => `<li>${i}</li>`).join('');
+                    document.getElementById('gen-rec-instructions').innerText = d.instructions;
                     document.getElementById('recipe-result').classList.remove('hidden');
-                } else throw new Error("Pusta odpowiedź z modelu");
-            } catch (e) {
-                console.error(e);
-                showToast("Błąd przy tworzeniu przepisu. " + (e.message || "")); 
-                document.getElementById('btn-generate-recipe').classList.remove('hidden');
-            } finally {
-                document.getElementById('recipe-loading').classList.add('hidden'); document.getElementById('recipe-loading').classList.remove('flex');
-            }
-        }
-
-        function closeRecipe() {
-            document.getElementById('recipe-result').classList.add('hidden');
-            document.getElementById('btn-generate-recipe').classList.remove('hidden');
+                }
+            } catch (e) { showToast("Błąd: " + (e.message).substring(0,60)); } 
+            finally { document.getElementById('recipe-loading').classList.add('hidden'); document.getElementById('recipe-loading').classList.remove('flex'); document.getElementById('btn-generate-recipe').classList.remove('hidden'); }
         }
 
         function saveState() { localStorage.setItem('dietAiState', JSON.stringify(state)); }
-        function loadState() {
-            const s = localStorage.getItem('dietAiState');
-            if (s) { const p = JSON.parse(s); state.profile = p.profile; if (p.today) state.today = p.today; }
-        }
+        function loadState() { const s = localStorage.getItem('dietAiState'); if(s) { const p = JSON.parse(s); state.profile = p.profile; if(p.today) state.today = p.today; } }
     </script>
 </body>
 </html>
