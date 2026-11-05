@@ -865,19 +865,10 @@
             const payload = {
                 contents: [{
                     role: "user",
-                    parts: [{ text: `Przeanalizuj posiłek. Zwróć wyłącznie czysty format JSON. Opis: "${desc || 'brak'}". Oszacuj Kcal i makro (B, W, T) dla CAŁEJ PORCJI. Zwróć estetyczną nazwę (mealName) oraz krótki werdykt po polsku (evaluation - czy to zdrowe/fit?).` }]
+                    parts: [{ text: `Jesteś dietetykiem. Przeanalizuj to zdjęcie i/lub opis: "${desc || 'brak'}". Zwróć WYŁĄCZNIE czysty JSON bez żadnych znaczników markdown czy tekstu pobocznego. Wymagany format: {"mealName": "Polska nazwa", "calories": liczba, "protein": liczba, "carbs": liczba, "fat": liczba, "evaluation": "Krótka ocena czy to dobry posiłek"}.` }]
                 }],
                 generationConfig: {
-                    responseMimeType: "application/json",
-                    responseSchema: {
-                        type: "OBJECT",
-                        properties: {
-                            mealName: { type: "STRING" }, calories: { type: "NUMBER" },
-                            protein: { type: "NUMBER" }, carbs: { type: "NUMBER" },
-                            fat: { type: "NUMBER" }, evaluation: { type: "STRING" }
-                        },
-                        required: ["mealName", "calories", "protein", "carbs", "fat", "evaluation"]
-                    }
+                    responseMimeType: "application/json"
                 }
             };
 
@@ -892,18 +883,22 @@
                 });
                 const result = await res.json();
                 
-                if (result.error) {
-                    throw new Error(result.error.message || "Błąd odpowiedzi API");
+                if (!res.ok) {
+                    throw new Error(result.error?.message || "Błąd komunikacji z API Google.");
                 }
 
                 let jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
                 
                 if (jsonText) {
-                    // Ekstrakcja czystego JSON-a za pomocą regex (odporność na wpadki AI z dodawaniem tekstu)
-                    const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
-                    if (!jsonMatch) throw new Error("Odpowiedź nie zawiera prawidłowego formatu JSON.");
+                    // Bulletproof JSON parsing
+                    jsonText = jsonText.replace(/```json/gi, '').replace(/```/g, '').trim();
+                    const jsonStart = jsonText.indexOf('{');
+                    const jsonEnd = jsonText.lastIndexOf('}') + 1;
+                    if (jsonStart !== -1 && jsonEnd !== 0) {
+                        jsonText = jsonText.substring(jsonStart, jsonEnd);
+                    }
                     
-                    const d = JSON.parse(jsonMatch[0]);
+                    const d = JSON.parse(jsonText);
                     
                     // Bezpieczne zaokrąglenia i przypisania
                     state.tempMeal = { 
@@ -929,9 +924,9 @@
                 }
             } catch (e) {
                 console.error("Szczegóły błędu analizy:", e);
-                // Wyświetla prawdziwy błąd jeśli jest krótki, w przeciwnym razie domyślny komunikat
-                const errorMsg = e.message && e.message.length < 100 ? e.message : "Błąd analizy. Zmień opis lub spróbuj ponownie.";
-                showToast("Błąd: " + errorMsg); 
+                // Bardziej wyrozumiały i informatywny komunikat
+                const errorMsg = e.message ? e.message : "Błąd analizy. Zmień opis lub spróbuj ponownie.";
+                showToast("Błąd: " + (errorMsg.length > 80 ? "Sprawdź konsolę (zbyt długi błąd API)." : errorMsg)); 
                 document.getElementById('btn-analyze').classList.remove('hidden');
             } finally {
                 document.getElementById('ai-loading').classList.add('hidden'); document.getElementById('ai-loading').classList.remove('flex');
@@ -978,17 +973,9 @@
 
             const p = state.profile, t = state.today;
             const payload = {
-                contents: [{ role: "user", parts: [{ text: `Składniki/Budżet: "${input}". Stwórz przepis trafiający w te makro (lub blisko): Kcal: ${Math.max(100, p.targetCalories - t.consumedCalories)}, Białko: ${Math.max(10, p.targetProtein - t.consumedProtein)}g, Węgle: ${Math.max(10, p.targetCarbs - t.consumedCarbs)}g, Tłuszcze: ${Math.max(5, p.targetFat - t.consumedFat)}g.` }] }],
+                contents: [{ role: "user", parts: [{ text: `Składniki/Budżet: "${input}". Stwórz przepis trafiający w te makro (lub blisko): Kcal: ${Math.max(100, p.targetCalories - t.consumedCalories)}, Białko: ${Math.max(10, p.targetProtein - t.consumedProtein)}g, Węgle: ${Math.max(10, p.targetCarbs - t.consumedCarbs)}g, Tłuszcze: ${Math.max(5, p.targetFat - t.consumedFat)}g. Zwróć WYŁĄCZNIE czysty JSON bez markdown w formacie: {"recipeName": "nazwa", "ingredients": ["składnik 1"], "instructions": ["krok 1"], "calories": 0, "protein": 0, "carbs": 0, "fat": 0}` }] }],
                 generationConfig: {
-                    responseMimeType: "application/json",
-                    responseSchema: {
-                        type: "OBJECT",
-                        properties: {
-                            recipeName: { type: "STRING" }, ingredients: { type: "ARRAY", items: { type: "STRING" } },
-                            instructions: { type: "ARRAY", items: { type: "STRING" } }, calories: { type: "NUMBER" },
-                            protein: { type: "NUMBER" }, carbs: { type: "NUMBER" }, fat: { type: "NUMBER" }
-                        }, required: ["recipeName", "ingredients", "instructions", "calories", "protein", "carbs", "fat"]
-                    }
+                    responseMimeType: "application/json"
                 }
             };
 
@@ -998,32 +985,37 @@
                 });
                 const result = await res.json();
                 
-                if (result.error) throw new Error(result.error.message);
+                if (!res.ok) throw new Error(result.error?.message || "Błąd API Google");
                 
-                const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                let jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
                 
                 if(jsonText) {
-                    const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
-                    if (!jsonMatch) throw new Error();
+                    // Bulletproof JSON parsing
+                    jsonText = jsonText.replace(/```json/gi, '').replace(/```/g, '').trim();
+                    const jsonStart = jsonText.indexOf('{');
+                    const jsonEnd = jsonText.lastIndexOf('}') + 1;
+                    if (jsonStart !== -1 && jsonEnd !== 0) {
+                        jsonText = jsonText.substring(jsonStart, jsonEnd);
+                    }
                     
-                    const d = JSON.parse(jsonMatch[0]);
-                    document.getElementById('gen-rec-name').innerText = d.recipeName; 
+                    const d = JSON.parse(jsonText);
+                    document.getElementById('gen-rec-name').innerText = d.recipeName || "Przepis AI"; 
                     document.getElementById('gen-rec-cal').innerText = Math.round(d.calories || 0);
                     document.getElementById('gen-rec-prot').innerText = Math.round(d.protein || 0); 
                     document.getElementById('gen-rec-carb').innerText = Math.round(d.carbs || 0);
                     document.getElementById('gen-rec-fat').innerText = Math.round(d.fat || 0);
                     
                     const iList = document.getElementById('gen-rec-ingredients'); iList.innerHTML = '';
-                    d.ingredients.forEach(i => iList.innerHTML += `<li class="flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-brand-500"></div>${i}</li>`);
+                    (d.ingredients || []).forEach(i => iList.innerHTML += `<li class="flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-brand-500"></div>${i}</li>`);
                     
                     const pList = document.getElementById('gen-rec-instructions'); pList.innerHTML = '';
-                    d.instructions.forEach(i => pList.innerHTML += `<li>${i}</li>`);
+                    (d.instructions || []).forEach(i => pList.innerHTML += `<li>${i}</li>`);
                     
                     document.getElementById('recipe-result').classList.remove('hidden');
                 } else throw new Error("Pusta odpowiedź z modelu");
             } catch (e) {
                 console.error(e);
-                showToast("Błąd przy tworzeniu przepisu."); 
+                showToast("Błąd przy tworzeniu przepisu. " + (e.message || "")); 
                 document.getElementById('btn-generate-recipe').classList.remove('hidden');
             } finally {
                 document.getElementById('recipe-loading').classList.add('hidden'); document.getElementById('recipe-loading').classList.remove('flex');
