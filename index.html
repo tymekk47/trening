@@ -1,403 +1,494 @@
 <!DOCTYPE html>
-<html lang="pl" class="transition-colors duration-300">
+<html lang="pl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="DietAI">
-    <meta name="theme-color" content="#0f172a" id="theme-color-meta">
-    <title>DietAI - Pro Tracker</title>
-
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Phosphor Icons -->
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <title>FitAI Scanner</title>
     
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: { 50: '#f0fdfa', 100: '#ccfbf1', 400: '#2dd4bf', 500: '#14b8a6', 600: '#0d9488', 900: '#134e4a' },
-                        darkbase: { 800: '#1e293b', 900: '#0f172a', 950: '#020617' }
-                    },
-                    fontFamily: { sans: ['Inter', 'sans-serif'] }
-                }
-            }
-        }
-    </script>
+    <!-- Ikona aplikacji (Sztanga/Fitness) -->
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2964/2964095.png">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        :root {
+            --bg-color: #0f172a; /* Slate 900 */
+            --card-bg: rgba(30, 41, 59, 0.7); /* Slate 800 z przezroczystością */
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #14b8a6; /* Teal 500 */
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            padding-bottom: calc(80px + env(safe-area-inset-bottom));
+            padding-top: env(safe-area-inset-top);
+            min-height: 100vh;
+        }
+
+        /* Glassmorphism utilities */
+        .glass-panel {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 1.25rem;
+        }
+
+        /* Nawigacja dolna */
+        .bottom-nav {
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--glass-border);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .nav-btn {
+            color: var(--text-muted);
+            transition: all 0.3s ease;
+        }
+        .nav-btn.active {
+            color: var(--accent);
+        }
+
+        /* Główny przycisk dodawania (FAB) */
+        .fab-btn {
+            background: linear-gradient(135deg, #2dd4bf, #0d9488);
+            box-shadow: 0 10px 25px -5px rgba(20, 184, 166, 0.5);
+            transform: translateY(-20px);
+            border: 4px solid var(--bg-color);
+        }
+
+        /* Sekcje */
+        .view-section { display: none; animation: fadeIn 0.3s ease-out; }
+        .view-section.active { display: block; }
         
-        body { -webkit-tap-highlight-color: transparent; scrollbar-width: none; }
-        body::-webkit-scrollbar { display: none; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Ukrywanie inputów pliku */
+        input[type="file"] { display: none; }
+
+        /* Powiadomienia */
+        #toast-container {
+            position: fixed;
+            top: calc(env(safe-area-inset-top, 40px) + 15px); /* Ominięcie Dynamic Island */
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            width: 90%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+        .toast {
+            background: var(--text-main);
+            color: var(--bg-color);
+            padding: 12px 20px;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            animation: slideDown 0.4s ease-out, fadeOut 0.4s ease-in 3s forwards;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; display: none; }
+        }
         
-        /* Glassmorphism */
-        .glass-panel { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.4); }
-        .dark .glass-panel { background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.05); }
-
-        .glass-card { background: linear-gradient(145deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.6) 100%); backdrop-filter: blur(10px); box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05); border: 1px solid rgba(255, 255, 255, 0.5); }
-        .dark .glass-card { background: linear-gradient(145deg, rgba(30,41,59,0.9) 0%, rgba(15,23,42,0.8) 100%); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.05); }
-
-        /* Animations */
-        .screen-fade { transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        .screen-fade.hidden-screen { opacity: 0; transform: scale(0.96) translateY(10px); pointer-events: none; position: absolute; top: 0; left: 0; width: 100%; visibility: hidden; }
-        .screen-fade.active-screen { opacity: 1; transform: scale(1) translateY(0); position: relative; visibility: visible; }
-
-        /* SVG Circular Progress */
-        .circular-chart { display: block; margin: 0 auto; max-width: 80%; max-height: 250px; }
-        .circle-bg { fill: none; stroke: #f1f5f9; stroke-width: 3.5; }
-        .dark .circle-bg { stroke: #334155; }
-        .circle { fill: none; stroke-width: 3.5; stroke-linecap: round; transition: stroke-dasharray 1s ease-out, stroke 0.5s ease; }
+        /* Spinner */
+        .loader {
+            border: 3px solid rgba(255,255,255,0.1);
+            border-radius: 50%;
+            border-top: 3px solid var(--accent);
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="bg-slate-50 dark:bg-darkbase-900 text-slate-900 dark:text-slate-50 h-[100dvh] w-full overflow-hidden flex transition-colors duration-300">
+<body>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="fixed top-[max(4.5rem,env(safe-area-inset-top))] left-1/2 transform -translate-x-1/2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-6 py-3 rounded-full shadow-2xl z-50 transition-all duration-400 opacity-0 pointer-events-none flex items-center gap-3 glass-panel">
-        <i class="ph-fill ph-info text-xl text-brand-400"></i>
-        <span id="toast-msg" class="text-sm font-semibold tracking-wide">Wiadomość</span>
-    </div>
+    <div id="toast-container"></div>
 
-    <!-- Desktop Sidebar -->
-    <aside class="hidden md:flex flex-col w-72 glass-panel border-r border-slate-200 dark:border-slate-800/50 relative z-20">
-        <div class="p-8 flex items-center gap-3">
-            <div class="w-12 h-12 bg-gradient-to-br from-brand-400 to-brand-600 rounded-2xl flex items-center justify-center shadow-lg shadow-brand-500/30">
-                <i class="ph-fill ph-barbell text-2xl text-white"></i>
+    <!-- WIDOK: HOME / DASHBOARD -->
+    <div id="view-home" class="view-section active p-5">
+        <header class="mb-8">
+            <h1 class="text-3xl font-bold tracking-tight">Dzisiejsze Makro</h1>
+            <p class="text-sm text-slate-400 mt-1" id="current-date">Wyliczanie...</p>
+        </header>
+
+        <div class="glass-panel p-6 mb-6 relative overflow-hidden">
+            <div class="absolute -right-10 -top-10 w-32 h-32 bg-teal-500 rounded-full blur-3xl opacity-20"></div>
+            <h2 class="text-slate-400 text-sm font-semibold uppercase tracking-wider mb-2">Spożyte Kalorie</h2>
+            <div class="flex items-end gap-2">
+                <span class="text-5xl font-extrabold text-white" id="total-kcal">0</span>
+                <span class="text-lg text-slate-400 mb-1">/ 2500 kcal</span>
             </div>
-            <h1 class="text-2xl font-extrabold tracking-tight">DietAI</h1>
+            
+            <!-- Pasek postępu -->
+            <div class="w-full bg-slate-700 h-2 rounded-full mt-5 overflow-hidden">
+                <div class="bg-teal-400 h-full rounded-full transition-all duration-500" style="width: 0%" id="kcal-bar"></div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-4">
+            <div class="glass-panel p-4 flex flex-col items-center justify-center">
+                <div class="text-xs text-slate-400 mb-1">Białko</div>
+                <div class="text-xl font-bold text-white"><span id="total-protein">0</span>g</div>
+            </div>
+            <div class="glass-panel p-4 flex flex-col items-center justify-center">
+                <div class="text-xs text-slate-400 mb-1">Węgle</div>
+                <div class="text-xl font-bold text-white"><span id="total-carbs">0</span>g</div>
+            </div>
+            <div class="glass-panel p-4 flex flex-col items-center justify-center">
+                <div class="text-xs text-slate-400 mb-1">Tłuszcze</div>
+                <div class="text-xl font-bold text-white"><span id="total-fat">0</span>g</div>
+            </div>
         </div>
         
-        <nav class="flex-1 px-4 space-y-2 mt-4">
-            <button onclick="navTo('dashboard')" id="side-nav-dashboard" class="w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-slate-500 font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"><i class="ph ph-house text-2xl"></i> Dashboard</button>
-            <button onclick="navTo('add-meal')" id="side-nav-add" class="w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-slate-500 font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"><i class="ph ph-camera-plus text-2xl"></i> Skaner AI</button>
-            <button onclick="navTo('recipes')" id="side-nav-recipes" class="w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-slate-500 font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"><i class="ph ph-magic-wand text-2xl"></i> Szef Kuchni</button>
-            <button onclick="navTo('settings')" id="side-nav-settings" class="w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-slate-500 font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"><i class="ph ph-gear text-2xl"></i> Ustawienia</button>
-        </nav>
-    </aside>
-
-    <!-- Main Content Area -->
-    <main class="flex-1 overflow-y-auto w-full relative z-10 pt-[env(safe-area-inset-top)] pb-[calc(100px+env(safe-area-inset-bottom))] md:pb-0" id="main-container">
-        <div class="max-w-xl mx-auto h-full relative">
-            
-            <!-- VIEW: SETUP -->
-            <section id="view-setup" class="screen-fade active-screen p-6 min-h-full flex flex-col justify-center">
-                <div class="text-center mb-10">
-                    <div class="w-20 h-20 bg-gradient-to-br from-brand-400 to-brand-600 rounded-[32px] mx-auto flex items-center justify-center mb-6"><i class="ph-fill ph-barbell text-4xl text-white"></i></div>
-                    <h1 class="text-3xl font-extrabold tracking-tight">Profil Sportowca</h1>
-                </div>
-                <form id="setup-form" class="space-y-5">
-                    <div class="grid grid-cols-2 gap-5">
-                        <select id="s-gender" class="glass-card rounded-2xl px-4 py-4 w-full outline-none text-center font-semibold text-slate-900 dark:text-white"><option value="male" class="text-black">Mężczyzna</option><option value="female" class="text-black">Kobieta</option></select>
-                        <input type="number" id="s-age" placeholder="Wiek" required min="10" max="100" class="glass-card rounded-2xl px-4 py-4 w-full outline-none text-center font-semibold bg-transparent placeholder-slate-500 text-slate-900 dark:text-white">
-                    </div>
-                    <div class="grid grid-cols-2 gap-5">
-                        <input type="number" id="s-weight" placeholder="Waga (kg)" required class="glass-card rounded-2xl px-4 py-4 w-full outline-none text-center font-semibold bg-transparent placeholder-slate-500 text-slate-900 dark:text-white">
-                        <input type="number" id="s-height" placeholder="Wzrost (cm)" required class="glass-card rounded-2xl px-4 py-4 w-full outline-none text-center font-semibold bg-transparent placeholder-slate-500 text-slate-900 dark:text-white">
-                    </div>
-                    <select id="s-activity" class="glass-card rounded-2xl px-4 py-4 w-full outline-none text-center font-semibold text-slate-900 dark:text-white"><option value="1.2" class="text-black">Siedzący tryb</option><option value="1.55" selected class="text-black">Średnia (3-5x w tyg)</option><option value="1.9" class="text-black">Zawodowiec</option></select>
-                    <select id="s-goal" class="glass-card rounded-2xl px-4 py-4 w-full outline-none text-center font-semibold text-slate-900 dark:text-white"><option value="-500" class="text-black">Redukcja</option><option value="0" selected class="text-black">Utrzymanie</option><option value="300" class="text-black">Budowa masy</option></select>
-                    <button type="submit" class="w-full bg-gradient-to-r from-brand-500 to-brand-600 text-white rounded-2xl py-4 font-bold mt-6">Generuj Plan</button>
-                </form>
-            </section>
-
-            <!-- VIEW: DASHBOARD -->
-            <section id="view-dashboard" class="screen-fade hidden-screen p-6 md:p-10">
-                <header class="flex justify-between items-end mb-8 pt-2">
-                    <div><h2 class="text-3xl font-extrabold tracking-tight">Przegląd</h2><p id="current-date" class="text-sm font-medium text-slate-500 mt-1 capitalize"></p></div>
-                    <button onclick="resetDaily()" class="w-12 h-12 glass-card rounded-2xl flex flex-col items-center justify-center text-slate-400"><i class="ph-bold ph-arrow-counter-clockwise text-xl"></i></button>
-                </header>
-
-                <div class="glass-card rounded-[2rem] p-8 mb-8 relative">
-                    <div class="relative w-full aspect-square max-w-[240px] mx-auto flex items-center justify-center">
-                        <svg viewBox="0 0 36 36" class="circular-chart w-full h-full absolute inset-0">
-                            <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                            <path class="circle stroke-brand-500" id="cal-progress-ring" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                        </svg>
-                        <div class="text-center z-10">
-                            <span id="cal-remaining" class="text-5xl font-black text-slate-900 dark:text-white">0</span>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Kcal Pozostało</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="glass-card rounded-[2rem] p-6 mb-10 space-y-6">
-                    <h3 class="font-extrabold text-xl mb-2">Makroskładniki</h3>
-                    <div class="space-y-4">
-                        <div>
-                            <div class="flex justify-between text-sm mb-1 font-semibold"><span class="text-indigo-500">Białko</span><span id="prot-text">0/0g</span></div>
-                            <div class="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-2"><div id="bar-prot" class="bg-indigo-500 h-full rounded-full" style="width: 0%"></div></div>
-                        </div>
-                        <div>
-                            <div class="flex justify-between text-sm mb-1 font-semibold"><span class="text-amber-500">Węgle</span><span id="carb-text">0/0g</span></div>
-                            <div class="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-2"><div id="bar-carb" class="bg-amber-500 h-full rounded-full" style="width: 0%"></div></div>
-                        </div>
-                        <div>
-                            <div class="flex justify-between text-sm mb-1 font-semibold"><span class="text-rose-500">Tłuszcze</span><span id="fat-text">0/0g</span></div>
-                            <div class="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-2"><div id="bar-fat" class="bg-rose-500 h-full rounded-full" style="width: 0%"></div></div>
-                        </div>
-                    </div>
-                </div>
-                
-                <h3 class="font-extrabold text-xl mb-4">Historia Dnia</h3>
-                <div id="meals-list" class="space-y-4"></div>
-            </section>
-
-            <!-- VIEW: SCANNER -->
-            <section id="view-add-meal" class="screen-fade hidden-screen p-6 md:p-10">
-                <header class="pt-2 mb-8">
-                    <h2 class="text-3xl font-extrabold tracking-tight">Skaner Posiłku</h2>
-                    <p class="text-sm font-medium text-slate-500 mt-2">Sztuczna inteligencja Gemini błyskawicznie oceni Twój posiłek.</p>
-                </header>
-
-                <div class="space-y-6">
-                    <div id="image-action-buttons" class="grid grid-cols-2 gap-4">
-                        <button onclick="document.getElementById('meal-camera').click()" class="glass-card flex flex-col items-center p-6 rounded-3xl"><i class="ph-fill ph-camera text-3xl text-brand-500 mb-2"></i><span class="text-sm font-bold">Zrób zdjęcie</span></button>
-                        <button onclick="document.getElementById('meal-gallery').click()" class="glass-card flex flex-col items-center p-6 rounded-3xl"><i class="ph-fill ph-image-square text-3xl text-indigo-500 mb-2"></i><span class="text-sm font-bold">Z galerii</span></button>
-                    </div>
-
-                    <input type="file" id="meal-camera" accept="image/*" capture="environment" class="hidden" onchange="handleImageSelect(event)">
-                    <input type="file" id="meal-gallery" accept="image/*" class="hidden" onchange="handleImageSelect(event)">
-
-                    <div id="image-preview-container" class="hidden relative w-full h-64 rounded-3xl overflow-hidden border border-slate-700">
-                        <img id="image-preview" class="w-full h-full object-cover">
-                        <button onclick="resetScanner()" class="absolute top-3 right-3 w-10 h-10 bg-black/50 rounded-full text-white flex items-center justify-center"><i class="ph-bold ph-x text-lg"></i></button>
-                    </div>
-
-                    <textarea id="meal-desc" rows="2" placeholder="Opisz posiłek (Opcjonalnie przy zdjęciu, wymagane bez zdjęcia)..." class="w-full glass-card border border-slate-200 dark:border-slate-700/50 rounded-2xl p-4 outline-none text-sm font-medium text-slate-900 dark:text-white bg-transparent"></textarea>
-
-                    <button id="btn-analyze" onclick="analyzeMeal()" class="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl py-4 font-extrabold shadow-xl flex items-center justify-center gap-2"><i class="ph-fill ph-sparkle text-brand-400"></i> Analizuj z AI</button>
-
-                    <div id="ai-loading" class="hidden flex-col items-center py-10"><i class="ph-fill ph-brain text-4xl text-brand-500 animate-pulse mb-3"></i><p class="font-bold text-brand-500">Analizowanie...</p></div>
-
-                    <div id="ai-result" class="hidden glass-card rounded-[2rem] p-6 shadow-xl border border-brand-200">
-                        <h3 id="res-name" class="font-black text-2xl mb-1 text-slate-900 dark:text-white">Nazwa</h3>
-                        <p id="res-eval" class="text-sm text-slate-500 mb-6">Ocena</p>
-                        <div class="grid grid-cols-4 gap-3 text-center mb-6">
-                            <div class="bg-slate-100 dark:bg-slate-800 rounded-xl p-2"><p class="text-[10px] font-bold text-slate-400">Kcal</p><p id="res-cal" class="font-black text-slate-900 dark:text-white">0</p></div>
-                            <div class="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-2"><p class="text-[10px] font-bold text-indigo-400">Białko</p><p id="res-prot" class="font-black text-indigo-600 dark:text-indigo-400">0</p></div>
-                            <div class="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-2"><p class="text-[10px] font-bold text-amber-500">Węgle</p><p id="res-carb" class="font-black text-amber-600 dark:text-amber-400">0</p></div>
-                            <div class="bg-rose-50 dark:bg-rose-900/20 rounded-xl p-2"><p class="text-[10px] font-bold text-rose-400">Tłuszcz</p><p id="res-fat" class="font-black text-rose-600 dark:text-rose-400">0</p></div>
-                        </div>
-                        <button onclick="confirmAddMeal()" class="w-full bg-brand-500 text-white rounded-xl py-3 font-bold">Zapisz w dzienniku</button>
-                    </div>
-                </div>
-            </section>
-
-            <!-- VIEW: CHEF -->
-            <section id="view-recipes" class="screen-fade hidden-screen p-6 md:p-10">
-                <header class="pt-2 mb-8"><h2 class="text-3xl font-extrabold tracking-tight">Szef Kuchni AI</h2></header>
-                <div class="glass-card rounded-[2rem] p-5 mb-8 text-center">
-                    <p class="text-xs text-brand-500 font-bold uppercase mb-1">Pozostałe Makro</p>
-                    <p class="font-black text-xl text-slate-900 dark:text-white mb-2"><span id="rec-target-cal">0</span> kcal</p>
-                    <div class="flex justify-center gap-4 text-sm font-bold text-slate-600 dark:text-slate-300">
-                        <span>B: <span id="rec-target-prot">0</span>g</span><span>W: <span id="rec-target-carb">0</span>g</span><span>T: <span id="rec-target-fat">0</span>g</span>
-                    </div>
-                </div>
-                <textarea id="recipe-ingredients" rows="3" placeholder="Co masz w lodówce? (np. kurczak, ryż, brokuł)" class="w-full glass-card border border-slate-200 dark:border-slate-700/50 rounded-2xl p-4 outline-none text-sm font-medium mb-4 text-slate-900 dark:text-white bg-transparent"></textarea>
-                <button id="btn-generate-recipe" onclick="generateRecipe()" class="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl py-4 font-extrabold flex items-center justify-center gap-2"><i class="ph-fill ph-cooking-pot text-brand-400"></i> Stwórz Przepis</button>
-                
-                <div id="recipe-loading" class="hidden flex-col items-center py-10"><i class="ph-fill ph-fire text-4xl text-amber-500 animate-pulse mb-3"></i><p class="font-bold text-amber-500">Gotowanie...</p></div>
-                
-                <div id="recipe-result" class="hidden glass-card rounded-[2rem] p-6 mt-4 text-slate-900 dark:text-white">
-                    <h3 id="gen-rec-name" class="font-black text-xl mb-4">Nazwa</h3>
-                    <ul id="gen-rec-ingredients" class="list-disc pl-5 text-sm mb-4 text-slate-600 dark:text-slate-300"></ul>
-                    <p id="gen-rec-instructions" class="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-line"></p>
-                </div>
-            </section>
-
-            <!-- VIEW: SETTINGS -->
-            <section id="view-settings" class="screen-fade hidden-screen p-6 md:p-10">
-                <header class="pt-2 mb-8"><h2 class="text-3xl font-extrabold tracking-tight">Ustawienia</h2></header>
-                <div class="glass-card rounded-[2rem] p-6 mb-6">
-                    <div class="flex items-center justify-between">
-                        <span class="font-bold text-slate-800 dark:text-white">Tryb Ciemny</span>
-                        <button onclick="toggleDarkMode()" class="w-14 h-7 rounded-full bg-brand-500 relative transition-colors focus:outline-none"><div id="theme-knob" class="w-5 h-5 bg-white rounded-full absolute top-1 left-1 dark:translate-x-7 transition-transform"></div></button>
-                    </div>
-                </div>
-                <div class="glass-card rounded-[2rem] p-6">
-                    <h3 class="font-extrabold text-lg mb-4 text-slate-800 dark:text-white">Klucz Gemini API</h3>
-                    <input type="password" id="api-key-input" placeholder="Klucz API..." class="w-full glass-card border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 outline-none text-slate-900 dark:text-white bg-transparent mb-4">
-                    <button onclick="saveApiKey()" class="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl py-3 font-bold">Zapisz Klucz</button>
-                </div>
-            </section>
-        </div>
-    </main>
-
-    <!-- MOBILE NAV -->
-    <nav id="bottom-nav" class="md:hidden fixed bottom-0 w-full z-40 pb-[env(safe-area-inset-bottom)] transition-transform duration-500 translate-y-full">
-        <div class="mx-4 mb-4 glass-panel rounded-3xl px-6 py-3 flex justify-between items-center bg-white/80 dark:bg-slate-900/80">
-            <button onclick="navTo('dashboard')" id="nav-btn-dashboard" class="flex flex-col items-center w-14 text-slate-400"><i class="ph ph-house text-2xl"></i><span class="text-[9px] font-bold uppercase mt-1">Home</span></button>
-            <button onclick="navTo('add-meal')" id="nav-btn-add" class="relative -top-6 flex flex-col items-center">
-                <div class="w-14 h-14 bg-gradient-to-tr from-brand-600 to-brand-400 rounded-full flex items-center justify-center text-white border-4 border-slate-50 dark:border-slate-900"><i class="ph-bold ph-plus text-2xl"></i></div>
-                <span class="text-[9px] font-bold uppercase mt-1 text-slate-500">Dodaj</span>
+        <div class="mt-8 flex justify-center">
+            <button onclick="resetDailyData()" class="text-slate-500 text-sm hover:text-white transition">
+                <i class="fas fa-trash-alt mr-2"></i>Resetuj dzisiejszy dzień
             </button>
-            <button onclick="navTo('recipes')" id="nav-btn-recipes" class="flex flex-col items-center w-14 text-slate-400"><i class="ph ph-magic-wand text-2xl"></i><span class="text-[9px] font-bold uppercase mt-1">Szef</span></button>
-            <button onclick="navTo('settings')" id="nav-btn-settings" class="flex flex-col items-center w-14 text-slate-400"><i class="ph ph-gear text-2xl"></i><span class="text-[9px] font-bold uppercase mt-1">Opcje</span></button>
         </div>
+    </div>
+
+    <!-- WIDOK: SKANER -->
+    <div id="view-scanner" class="view-section p-5">
+        <header class="mb-6">
+            <h1 class="text-3xl font-bold tracking-tight">Skaner AI</h1>
+            <p class="text-sm text-slate-400 mt-1">Zrób zdjęcie posiłku lub opisz go słowami.</p>
+        </header>
+
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <label for="cameraInput" class="glass-panel p-6 flex flex-col items-center justify-center cursor-pointer active:scale-95 transition">
+                <div class="w-12 h-12 rounded-full bg-teal-500/20 text-teal-400 flex items-center justify-center mb-3 text-xl">
+                    <i class="fas fa-camera"></i>
+                </div>
+                <span class="font-semibold text-sm">Zrób zdjęcie</span>
+                <input type="file" accept="image/*" capture="environment" id="cameraInput" onchange="handleImage(this)">
+            </label>
+
+            <label for="galleryInput" class="glass-panel p-6 flex flex-col items-center justify-center cursor-pointer active:scale-95 transition">
+                <div class="w-12 h-12 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center mb-3 text-xl">
+                    <i class="fas fa-images"></i>
+                </div>
+                <span class="font-semibold text-sm">Z galerii</span>
+                <input type="file" accept="image/*" id="galleryInput" onchange="handleImage(this)">
+            </label>
+        </div>
+
+        <!-- Podgląd zdjęcia -->
+        <div id="image-preview-container" class="hidden mb-6 relative">
+            <img id="image-preview" class="w-full h-48 object-cover rounded-2xl border border-slate-700 shadow-lg" src="" alt="Podgląd">
+            <button onclick="removeImage()" class="absolute top-2 right-2 bg-slate-900/80 text-white w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="glass-panel p-1 mb-6">
+            <textarea id="meal-description" rows="3" class="w-full bg-transparent border-none text-white placeholder-slate-500 p-4 focus:ring-0 resize-none text-sm" placeholder="Opisz posiłek, np. Twaróg półtłusty, łyżeczka miodu, cynamon... (Jeśli dodajesz zdjęcie, opis jest opcjonalny)"></textarea>
+        </div>
+
+        <button id="analyze-btn" onclick="runAnalysis()" class="w-full bg-white text-slate-900 font-bold py-4 rounded-2xl text-lg flex items-center justify-center gap-3 active:scale-95 transition shadow-lg">
+            <i class="fas fa-magic text-teal-500"></i>
+            <span>Analizuj z AI</span>
+            <div id="analyze-loader" class="loader"></div>
+        </button>
+    </div>
+
+    <!-- WIDOK: USTAWIENIA -->
+    <div id="view-settings" class="view-section p-5">
+        <header class="mb-8">
+            <h1 class="text-3xl font-bold tracking-tight">Ustawienia</h1>
+            <p class="text-sm text-slate-400 mt-1">Konfiguracja klucza i profilu.</p>
+        </header>
+
+        <div class="glass-panel p-5 mb-6">
+            <h2 class="text-sm font-semibold text-teal-400 mb-3 flex items-center gap-2">
+                <i class="fas fa-key"></i> Klucz Gemini API
+            </h2>
+            <p class="text-xs text-slate-400 mb-4 leading-relaxed">
+                Aplikacja przetwarza dane bezpośrednio w przeglądarce. Twój klucz jest szyfrowany i zapisywany w `localStorage` Twojego urządzenia.
+            </p>
+            <input type="password" id="api-key-input" placeholder="AIzaSy..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-teal-500 mb-4">
+            <button onclick="saveApiKey()" class="w-full bg-teal-500 hover:bg-teal-400 text-white font-bold py-3 rounded-xl transition">
+                Zapisz Klucz
+            </button>
+        </div>
+    </div>
+
+    <!-- NAWIGACJA DOLNA -->
+    <nav class="bottom-nav fixed bottom-0 left-0 w-full z-50 px-6 py-2 flex justify-between items-center">
+        <button onclick="switchView('home')" id="nav-home" class="nav-btn active flex flex-col items-center p-2 w-16">
+            <i class="fas fa-chart-pie text-xl mb-1"></i>
+            <span class="text-[10px] font-semibold">Dashboard</span>
+        </button>
+
+        <div class="relative w-16 flex justify-center">
+            <button onclick="switchView('scanner')" id="nav-scanner" class="fab-btn absolute -top-8 w-14 h-14 rounded-full text-white flex items-center justify-center text-2xl transition active:scale-95">
+                <i class="fas fa-plus"></i>
+            </button>
+        </div>
+
+        <button onclick="switchView('settings')" id="nav-settings" class="nav-btn flex flex-col items-center p-2 w-16">
+            <i class="fas fa-cog text-xl mb-1"></i>
+            <span class="text-[10px] font-semibold">Opcje</span>
+        </button>
     </nav>
 
-    <canvas id="image-canvas" class="hidden"></canvas>
-
     <script>
-        const state = { profile: null, today: { date: new Date().toLocaleDateString('pl-PL'), consumedCalories: 0, consumedProtein: 0, consumedCarbs: 0, consumedFat: 0, meals: [] }, tempMeal: null };
-        let currentBase64Image = null;
+        // --- INICJALIZACJA ---
+        const dailyData = JSON.parse(localStorage.getItem('fitai_daily_data')) || { kcal: 0, protein: 0, carbs: 0, fat: 0, date: new Date().toDateString() };
+        let currentImageBase64 = null;
 
-        window.onload = () => {
-            loadDarkMode(); loadState();
-            const savedKey = localStorage.getItem('gemini_api_key');
-            if (savedKey) document.getElementById('api-key-input').value = savedKey;
+        document.getElementById('current-date').textContent = new Date().toLocaleDateString('pl-PL', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        
+        // Sprawdź czy to nowy dzień
+        if (dailyData.date !== new Date().toDateString()) {
+            resetDailyData(false);
+        } else {
+            updateDashboard();
+        }
+
+        // --- SYSTEM POWIADOMIEŃ ---
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => { toast.remove(); }, 3400);
+        }
+
+        // --- NAWIGACJA ---
+        function switchView(viewName) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
             
-            if (!state.profile) navTo('setup');
-            else { checkNewDay(); updateDashboardUI(); navTo('dashboard'); document.getElementById('bottom-nav').classList.remove('translate-y-full'); }
-        };
-
-        function toggleDarkMode() { document.documentElement.classList.toggle('dark'); localStorage.setItem('dietAiTheme', document.documentElement.classList.contains('dark') ? 'dark' : 'light'); }
-        function loadDarkMode() { if (localStorage.getItem('dietAiTheme') === 'dark' || (!localStorage.getItem('dietAiTheme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark'); }
-
-        function navTo(view) {
-            document.querySelectorAll('.screen-fade').forEach(el => { el.classList.remove('active-screen'); el.classList.add('hidden-screen'); });
-            document.getElementById(`view-${view}`).classList.remove('hidden-screen'); document.getElementById(`view-${view}`).classList.add('active-screen');
-            ['dashboard', 'recipes', 'settings'].forEach(b => {
-                const el = document.getElementById(`nav-btn-${b}`);
-                if(el) { el.classList.toggle('text-brand-500', b === view); el.classList.toggle('text-slate-400', b !== view); }
-            });
-            if (view === 'recipes') updateRecipeUI();
-            document.getElementById('main-container').scrollTo(0,0);
+            document.getElementById(`view-${viewName}`).classList.add('active');
+            if (viewName !== 'scanner') {
+                document.getElementById(`nav-${viewName}`).classList.add('active');
+            }
         }
 
-        function showToast(msg) {
-            const t = document.getElementById('toast'); document.getElementById('toast-msg').innerText = msg;
-            t.classList.remove('opacity-0', 'pointer-events-none'); setTimeout(() => t.classList.add('opacity-0', 'pointer-events-none'), 3000);
-        }
+        // --- OBSŁUGA ZDJĘĆ Z KOMPRESJĄ ---
+        function handleImage(input) {
+            const file = input.files[0];
+            if (!file) return;
 
-        document.getElementById('setup-form').onsubmit = (e) => {
-            e.preventDefault();
-            const w = +document.getElementById('s-weight').value, h = +document.getElementById('s-height').value, a = +document.getElementById('s-age').value, act = +document.getElementById('s-activity').value, g = +document.getElementById('s-goal').value;
-            const tdee = Math.round(((10 * w) + (6.25 * h) - (5 * a) + (document.getElementById('s-gender').value === 'male' ? 5 : -161)) * act) + g;
-            state.profile = { targetCalories: tdee, targetProtein: Math.round(w * 2.2), targetFat: Math.round(w * 1.0), targetCarbs: Math.max(0, Math.round((tdee - (w*2.2*4) - (w*1.0*9)) / 4)) };
-            saveState(); updateDashboardUI(); document.getElementById('bottom-nav').classList.remove('translate-y-full'); navTo('dashboard');
-        };
-
-        function updateDashboardUI() {
-            if(!state.profile) return;
-            const p = state.profile, t = state.today;
-            document.getElementById('cal-remaining').innerText = Math.max(0, p.targetCalories - t.consumedCalories);
-            document.getElementById('cal-progress-ring').setAttribute('stroke-dasharray', `${Math.min(100, (t.consumedCalories / p.targetCalories) * 100)}, 100`);
-            document.getElementById('prot-text').innerText = `${t.consumedProtein}/${p.targetProtein}g`; document.getElementById('bar-prot').style.width = `${Math.min(100, (t.consumedProtein/p.targetProtein)*100)}%`;
-            document.getElementById('carb-text').innerText = `${t.consumedCarbs}/${p.targetCarbs}g`; document.getElementById('bar-carb').style.width = `${Math.min(100, (t.consumedCarbs/p.targetCarbs)*100)}%`;
-            document.getElementById('fat-text').innerText = `${t.consumedFat}/${p.targetFat}g`; document.getElementById('bar-fat').style.width = `${Math.min(100, (t.consumedFat/p.targetFat)*100)}%`;
-            
-            const list = document.getElementById('meals-list'); list.innerHTML = '';
-            t.meals.forEach(m => list.innerHTML = `<div class="glass-card p-4 rounded-xl flex justify-between mb-3 border-l-4 border-brand-500"><div><p class="font-bold">${m.name}</p><p class="text-xs text-slate-500">B:${m.p} W:${m.c} T:${m.f}</p></div><div class="font-black text-brand-500">${m.cals} kcal</div></div>` + list.innerHTML);
-        }
-
-        function resetDaily() { state.today = { date: new Date().toLocaleDateString('pl-PL'), consumedCalories: 0, consumedProtein: 0, consumedCarbs: 0, consumedFat: 0, meals: [] }; saveState(); updateDashboardUI(); showToast("Nowy dzień!"); }
-        function checkNewDay() { if (state.today.date !== new Date().toLocaleDateString('pl-PL')) resetDaily(); }
-        function saveApiKey() { localStorage.setItem('gemini_api_key', document.getElementById('api-key-input').value.trim()); showToast("Klucz zapisany!"); }
-
-        function handleImageSelect(e) {
-            const file = e.target.files[0]; if(!file) return;
-            const r = new FileReader();
-            r.onload = e => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
                 const img = new Image();
-                img.onload = () => {
-                    const c = document.getElementById('image-canvas'), scale = 600 / img.width;
-                    c.width = 600; c.height = img.height * scale;
-                    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-                    currentBase64Image = c.toDataURL('image/jpeg', 0.7).split(',')[1];
-                    document.getElementById('image-preview').src = e.target.result;
-                    document.getElementById('image-action-buttons').classList.add('hidden'); document.getElementById('image-preview-container').classList.remove('hidden');
-                }; img.src = e.target.result;
-            }; r.readAsDataURL(file);
-        }
+                img.onload = function() {
+                    // Kompresja obrazu (zapobiega błędom Payload Too Large w API)
+                    const canvas = document.createElement('canvas');
+                    const MAX_SIZE = 1024;
+                    let width = img.width;
+                    let height = img.height;
 
-        function resetScanner() { currentBase64Image = null; document.getElementById('meal-desc').value = ''; document.getElementById('image-preview-container').classList.add('hidden'); document.getElementById('image-action-buttons').classList.remove('hidden'); document.getElementById('ai-result').classList.add('hidden'); document.getElementById('btn-analyze').classList.remove('hidden'); }
+                    if (width > height && width > MAX_SIZE) {
+                        height *= MAX_SIZE / width;
+                        width = MAX_SIZE;
+                    } else if (height > MAX_SIZE) {
+                        width *= MAX_SIZE / height;
+                        height = MAX_SIZE;
+                    }
 
-        async function analyzeMeal() {
-            const desc = document.getElementById('meal-desc').value.trim();
-            if (!currentBase64Image && !desc) { showToast("Podaj zdjęcie lub tekst."); return; }
-            const key = localStorage.getItem('gemini_api_key'); if (!key) { showToast("Brak klucza API."); navTo('settings'); return; }
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
 
-            document.getElementById('btn-analyze').classList.add('hidden'); document.getElementById('ai-loading').classList.remove('hidden'); document.getElementById('ai-loading').classList.add('flex');
-            
-            const parts = [{ text: `Przeanalizuj kalorie posiłku z obrazu lub opisu: "${desc}". Zwróć kod JSON. Schemat: {"mealName": "nazwa", "calories": 0, "protein": 0, "carbs": 0, "fat": 0, "evaluation": "ocena"}` }];
-            if (currentBase64Image) parts.push({ inlineData: { mimeType: "image/jpeg", data: currentBase64Image } });
-
-            // CRITICAL FIX: Zawsze używamy endpointu v1beta, aby uniknąć błędów nieznalezienia modelu.
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
-            
-            try {
-                const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ role: "user", parts }], generationConfig: { responseMimeType: "application/json" } }) });
-                const result = await res.json();
-                if (!res.ok) throw new Error(result.error?.message || "Błąd API Google");
-                
-                let jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-                if(jsonText) {
-                    // Bezpieczne wydobycie JSONa przez regex
-                    const match = jsonText.match(/\{[\s\S]*\}/);
-                    if(!match) throw new Error("API nie zwróciło JSON");
-                    const d = JSON.parse(match[0]);
+                    // Konwersja do JPEG 80% jakości
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
                     
-                    state.tempMeal = { name: d.mealName || "Posiłek", cals: Math.round(d.calories||0), p: Math.round(d.protein||0), c: Math.round(d.carbs||0), f: Math.round(d.fat||0) };
-                    document.getElementById('res-name').innerText = state.tempMeal.name; document.getElementById('res-eval').innerText = d.evaluation || "";
-                    document.getElementById('res-cal').innerText = state.tempMeal.cals; document.getElementById('res-prot').innerText = state.tempMeal.p+'g'; document.getElementById('res-carb').innerText = state.tempMeal.c+'g'; document.getElementById('res-fat').innerText = state.tempMeal.f+'g';
-                    document.getElementById('ai-result').classList.remove('hidden');
-                } else throw new Error("Pusta odpowiedź z modelu");
-            } catch (e) { showToast("Błąd: " + (e.message).substring(0,60)); document.getElementById('btn-analyze').classList.remove('hidden'); } 
-            finally { document.getElementById('ai-loading').classList.add('hidden'); document.getElementById('ai-loading').classList.remove('flex'); }
+                    document.getElementById('image-preview').src = dataUrl;
+                    document.getElementById('image-preview-container').classList.remove('hidden');
+                    currentImageBase64 = dataUrl;
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+            input.value = ''; // Reset inputu
         }
 
-        function confirmAddMeal() {
-            if(!state.tempMeal) return; const m = state.tempMeal, t = state.today;
-            t.consumedCalories += m.cals; t.consumedProtein += m.p; t.consumedCarbs += m.c; t.consumedFat += m.f; t.meals.push(m);
-            saveState(); updateDashboardUI(); resetScanner(); showToast("Dodano do dziennika."); navTo('dashboard');
+        function removeImage() {
+            currentImageBase64 = null;
+            document.getElementById('image-preview-container').classList.add('hidden');
+            document.getElementById('image-preview').src = '';
         }
 
-        function updateRecipeUI() {
-            if(!state.profile) return; const p = state.profile, t = state.today;
-            document.getElementById('rec-target-cal').innerText = Math.max(0, p.targetCalories - t.consumedCalories);
-            document.getElementById('rec-target-prot').innerText = Math.max(0, p.targetProtein - t.consumedProtein);
-            document.getElementById('rec-target-carb').innerText = Math.max(0, p.targetCarbs - t.consumedCarbs);
-            document.getElementById('rec-target-fat').innerText = Math.max(0, p.targetFat - t.consumedFat);
-        }
+        // --- GŁÓWNA ANALIZA AI (PANCERNA) ---
+        async function runAnalysis() {
+            const text = document.getElementById('meal-description').value.trim();
+            const apiKey = localStorage.getItem('gemini_api_key');
+            
+            if (!apiKey) {
+                showToast("Wymagany klucz API w ustawieniach!");
+                switchView('settings');
+                return;
+            }
 
-        async function generateRecipe() {
-            const input = document.getElementById('recipe-ingredients').value; if(!input) return showToast("Dodaj listę składników.");
-            const key = localStorage.getItem('gemini_api_key'); if (!key) return showToast("Brak klucza API.");
+            if (!text && !currentImageBase64) {
+                showToast("Dodaj zdjęcie lub opis posiłku.");
+                return;
+            }
+
+            const btnText = document.querySelector('#analyze-btn span');
+            const icon = document.querySelector('#analyze-btn i');
+            const loader = document.getElementById('analyze-loader');
             
-            document.getElementById('btn-generate-recipe').classList.add('hidden'); document.getElementById('recipe-loading').classList.remove('hidden'); document.getElementById('recipe-loading').classList.add('flex');
-            
-            const p = state.profile, t = state.today;
-            const prompt = `Składniki: "${input}". Przepis dla makro: Kcal: ${Math.max(100, p.targetCalories - t.consumedCalories)}, B: ${Math.max(10, p.targetProtein - t.consumedProtein)}g, W: ${Math.max(10, p.targetCarbs - t.consumedCarbs)}g, T: ${Math.max(5, p.targetFat - t.consumedFat)}g. Zwróć JSON: {"recipeName": "nazwa", "ingredients": ["składnik 1"], "instructions": "krok 1\\nkrok 2"}`;
-            
-            // Wymuszony endpoint v1beta z gemini-1.5-flash
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
-            
+            btnText.style.display = 'none';
+            icon.style.display = 'none';
+            loader.style.display = 'block';
+
             try {
-                const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ role: "user", parts: [{text: prompt}] }], generationConfig: { responseMimeType: "application/json" } }) });
-                const result = await res.json();
-                if (!res.ok) throw new Error(result.error?.message || "Błąd API Google");
+                // Nowy, poprawny endpoint v1beta z nazwą modelu w URL
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
                 
-                let jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-                if(jsonText) {
-                    const match = jsonText.match(/\{[\s\S]*\}/);
-                    if(!match) throw new Error("API nie zwróciło JSON");
-                    const d = JSON.parse(match[0]);
-                    
-                    document.getElementById('gen-rec-name').innerText = d.recipeName;
-                    document.getElementById('gen-rec-ingredients').innerHTML = d.ingredients.map(i => `<li>${i}</li>`).join('');
-                    document.getElementById('gen-rec-instructions').innerText = d.instructions;
-                    document.getElementById('recipe-result').classList.remove('hidden');
+                const prompt = `Jesteś ekspertem dietetyki. Przeanalizuj posiłek na podstawie podanego opisu lub/i zdjęcia.
+                Twoim JEDYNYM zadaniem jest zwrócenie surowego obiektu JSON z wartościami.
+                Nie pisz żadnego dodatkowego tekstu. Zwróć tylko i wyłącznie dane w tym formacie:
+                {"kcal": 0, "protein": 0, "carbs": 0, "fat": 0}
+                Dodatkowy opis od użytkownika: ${text || "brak"}`;
+
+                const parts = [{ text: prompt }];
+
+                if (currentImageBase64) {
+                    // BEZWZGLĘDNE CZYSZCZENIE PREFIKSU BASE64 (Cichy zabójca API)
+                    const cleanBase64 = currentImageBase64.split(',')[1];
+                    parts.push({
+                        inlineData: {
+                            mimeType: "image/jpeg",
+                            data: cleanBase64
+                        }
+                    });
                 }
-            } catch (e) { showToast("Błąd: " + (e.message).substring(0,60)); } 
-            finally { document.getElementById('recipe-loading').classList.add('hidden'); document.getElementById('recipe-loading').classList.remove('flex'); document.getElementById('btn-generate-recipe').classList.remove('hidden'); }
+
+                const payload = {
+                    contents: [{ role: "user", parts: parts }],
+                    generationConfig: {
+                        temperature: 0.1,
+                        responseMimeType: "application/json" // Wymuszenie trybu JSON po stronie Google
+                    }
+                };
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const err = await response.json();
+                    console.error("Szczegóły błędu API:", err);
+                    throw new Error(err.error?.message || "Odrzucono zapytanie (status: " + response.status + ")");
+                }
+
+                const data = await response.json();
+                let resultText = data.candidates[0].content.parts[0].text;
+                
+                // Kuloodporne parsowanie odpowiedzi (Regex do wyciągnięcia struktury JSON w razie wpadki modelu)
+                const jsonMatch = resultText.match(/\{[\s\S]*?\}/);
+                if (!jsonMatch) throw new Error("Model nie zwrócił danych w formacie JSON.");
+                
+                const parsed = JSON.parse(jsonMatch[0]);
+
+                const kcal = Math.round(Number(parsed.kcal) || 0);
+                const protein = Math.round(Number(parsed.protein) || 0);
+                const carbs = Math.round(Number(parsed.carbs) || 0);
+                const fat = Math.round(Number(parsed.fat) || 0);
+
+                // Zapisz do statystyk
+                dailyData.kcal += kcal;
+                dailyData.protein += protein;
+                dailyData.carbs += carbs;
+                dailyData.fat += fat;
+                localStorage.setItem('fitai_daily_data', JSON.stringify(dailyData));
+
+                updateDashboard();
+                showToast(`Dodano: ${kcal} kcal!`);
+                
+                // Czyszczenie formularza i powrót do głównego ekranu
+                document.getElementById('meal-description').value = '';
+                removeImage();
+                switchView('home');
+
+            } catch (error) {
+                console.error(error);
+                if (error.message.includes("API key not valid")) {
+                    showToast("Błąd: Nieprawidłowy klucz API.");
+                } else if (error.message.includes("payload too large")) {
+                    showToast("Błąd: Zbyt duże zdjęcie.");
+                } else {
+                    showToast("Błąd analizy. Spróbuj zmienić opis/zdjęcie.");
+                }
+            } finally {
+                btnText.style.display = 'block';
+                icon.style.display = 'block';
+                loader.style.display = 'none';
+            }
         }
 
-        function saveState() { localStorage.setItem('dietAiState', JSON.stringify(state)); }
-        function loadState() { const s = localStorage.getItem('dietAiState'); if(s) { const p = JSON.parse(s); state.profile = p.profile; if(p.today) state.today = p.today; } }
+        // --- FUNKCJE POMOCNICZE ---
+        function updateDashboard() {
+            document.getElementById('total-kcal').textContent = dailyData.kcal;
+            document.getElementById('total-protein').textContent = dailyData.protein;
+            document.getElementById('total-carbs').textContent = dailyData.carbs;
+            document.getElementById('total-fat').textContent = dailyData.fat;
+            
+            const progress = Math.min((dailyData.kcal / 2500) * 100, 100);
+            document.getElementById('kcal-bar').style.width = `${progress}%`;
+            
+            if(progress > 100) document.getElementById('kcal-bar').classList.replace('bg-teal-400', 'bg-red-500');
+        }
+
+        function resetDailyData(manual = true) {
+            if (manual && !confirm("Na pewno zresetować dzisiejsze makro?")) return;
+            dailyData.kcal = 0; dailyData.protein = 0; dailyData.carbs = 0; dailyData.fat = 0;
+            dailyData.date = new Date().toDateString();
+            localStorage.setItem('fitai_daily_data', JSON.stringify(dailyData));
+            updateDashboard();
+            if(manual) showToast("Dane zresetowane.");
+        }
+
+        function saveApiKey() {
+            const key = document.getElementById('api-key-input').value.trim();
+            if (key.length > 10) {
+                localStorage.setItem('gemini_api_key', key);
+                showToast("Klucz zapisany pomyślnie!");
+                document.getElementById('api-key-input').value = '';
+            } else {
+                showToast("Wprowadź prawidłowy klucz!");
+            }
+        }
+        
+        // Pokaż ewentualny klucz (zagwiazdkowany) w input po załadowaniu
+        window.onload = () => {
+            if(localStorage.getItem('gemini_api_key')) {
+                document.getElementById('api-key-input').placeholder = "Klucz jest już zapisany (ukryty)";
+            }
+        };
     </script>
 </body>
 </html>
