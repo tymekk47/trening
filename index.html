@@ -862,35 +862,49 @@
             document.getElementById('ai-loading').classList.add('flex');
             document.getElementById('ai-result').classList.add('hidden');
 
+            // 1. Bezpieczna konstrukcja części tekstowej (w tym ścisły prompt z zerami)
+            const parts = [
+                { text: `Jesteś dietetykiem. Przeanalizuj to zdjęcie i/lub opis: "${desc || 'brak opisu'}". Zwróć WYŁĄCZNIE dane w formacie JSON. Użyj dokładnie tego schematu (wypełnij liczbami całkowitymi): {"mealName": "nazwa", "calories": 0, "protein": 0, "carbs": 0, "fat": 0, "evaluation": "krótka ocena"}` }
+            ];
+
+            // 2. Dodajemy część obrazkową TYLKO wtedy, gdy mamy przetworzone zdjęcie
+            if (currentBase64Image) {
+                parts.push({
+                    inlineData: {
+                        mimeType: "image/jpeg",
+                        data: currentBase64Image
+                    }
+                });
+            }
+
             const payload = {
                 contents: [{
                     role: "user",
-                    parts: [{ text: `Jesteś dietetykiem. Przeanalizuj to zdjęcie i/lub opis: "${desc || 'brak'}". Zwróć WYŁĄCZNIE czysty JSON bez żadnych znaczników markdown czy tekstu pobocznego. Wymagany format: {"mealName": "Polska nazwa", "calories": liczba, "protein": liczba, "carbs": liczba, "fat": liczba, "evaluation": "Krótka ocena czy to dobry posiłek"}.` }]
+                    parts: parts
                 }],
                 generationConfig: {
                     responseMimeType: "application/json"
                 }
             };
 
-            // Dodajemy zdjęcie do promptu TYLKO jeśli zostało wybrane
-            if (currentBase64Image) {
-                payload.contents[0].parts.push({ inlineData: { mimeType: "image/jpeg", data: currentBase64Image } });
-            }
-
             try {
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify(payload)
                 });
+                
                 const result = await res.json();
                 
                 if (!res.ok) {
-                    throw new Error(result.error?.message || "Błąd komunikacji z API Google.");
+                    const errMsg = result.error?.message || "Nieznany błąd API";
+                    throw new Error(errMsg);
                 }
 
                 let jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
                 
                 if (jsonText) {
-                    // Bulletproof JSON parsing
+                    // 3. Kuloodporne czyszczenie JSON-a na wypadek "odklejki" modelu
                     jsonText = jsonText.replace(/```json/gi, '').replace(/```/g, '').trim();
                     const jsonStart = jsonText.indexOf('{');
                     const jsonEnd = jsonText.lastIndexOf('}') + 1;
@@ -900,7 +914,6 @@
                     
                     const d = JSON.parse(jsonText);
                     
-                    // Bezpieczne zaokrąglenia i przypisania
                     state.tempMeal = { 
                         name: d.mealName || "Nieznany posiłek", 
                         cals: Math.round(d.calories || 0), 
@@ -920,16 +933,18 @@
                     
                     document.getElementById('ai-result').classList.remove('hidden');
                 } else {
-                    throw new Error("Pusta odpowiedź lub naruszenie zasad bezpieczeństwa modelu (Safety block).");
+                    throw new Error("Pusta odpowiedź z modelu (Safety block).");
                 }
             } catch (e) {
-                console.error("Szczegóły błędu analizy:", e);
-                // Bardziej wyrozumiały i informatywny komunikat
-                const errorMsg = e.message ? e.message : "Błąd analizy. Zmień opis lub spróbuj ponownie.";
-                showToast("Błąd: " + (errorMsg.length > 80 ? "Sprawdź konsolę (zbyt długi błąd API)." : errorMsg)); 
+                console.error("Szczegóły błędu:", e);
+                let errorMsg = e.message || String(e);
+                // Obcinamy powiadomienie, żeby idealnie mieściło się w "toascie" na iPhonie
+                if (errorMsg.length > 55) errorMsg = errorMsg.substring(0, 55) + "...";
+                showToast("Błąd: " + errorMsg); 
                 document.getElementById('btn-analyze').classList.remove('hidden');
             } finally {
-                document.getElementById('ai-loading').classList.add('hidden'); document.getElementById('ai-loading').classList.remove('flex');
+                document.getElementById('ai-loading').classList.add('hidden'); 
+                document.getElementById('ai-loading').classList.remove('flex');
             }
         }
 
